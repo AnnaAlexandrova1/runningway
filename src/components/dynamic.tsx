@@ -4,12 +4,14 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import React from 'react';
 // @ts-ignore
 import {dynamics} from "../services/data";
+import {IObjecLiteral} from "../interfaces/interfaces";
+import {chartColors} from "../services/stylesData";
 
 
-const DynamicComponent = (props: any) => {
-    const {dynamics} = props;
+const DynamicComponent = (props: { dynamics: [], selectPid: string[] }) => {
+    const {dynamics, selectPid} = props;
 
-    console.log(dynamics.Splits)
+   console.log('dynamicsssss', dynamics);
     return (
         <div style={{"marginRight": "auto", "marginLeft": "auto", width: 'fit-content'}}>
         <LineChart
@@ -24,12 +26,14 @@ const DynamicComponent = (props: any) => {
             }}
         >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
+            <XAxis dataKey="Name" />
             <YAxis />
             <Tooltip />
             <Legend />
-            <Line type="monotone" dataKey="position" stroke="#8884d8" activeDot={{ r: 8 }} />
-            <Line type="monotone" dataKey="position2" stroke="#82ca9d" />
+            {selectPid.map((item, i) => {
+                    return <Line key={item} type="monotone" dataKey={`position${i}`} stroke={chartColors[i]}/>
+                }
+            )}
         </LineChart>
         </div>
     );

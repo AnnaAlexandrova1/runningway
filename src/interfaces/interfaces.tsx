@@ -9,3 +9,7 @@ export interface IParticipant {
     finish: string;
     pId: string
 }
+
+export interface IObjecLiteral {
+    [key: string]: any
+}
