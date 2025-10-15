@@ -8,16 +8,21 @@ import {IObjecLiteral} from "../interfaces/interfaces";
 import {chartColors} from "../services/stylesData";
 
 
-const DynamicComponent = (props: { dynamics: [], selectPid: string[] }) => {
-    const {dynamics, selectPid} = props;
+const DynamicComponent = (props: { dynamics: [], selectPid: string[], legend: IObjecLiteral }) => {
+    const {dynamics, selectPid, legend} = props;
 
-   console.log('dynamicsssss', dynamics);
+    const dynamicsWithoutFirst = (data: any[]) => {
+        return data.slice(1)
+    }
+
+
+
     return (
         <div style={{"marginRight": "auto", "marginLeft": "auto", width: 'fit-content'}}>
         <LineChart
             width={1400}
             height={500}
-            data={dynamics}
+            data={dynamicsWithoutFirst(dynamics)}
             margin={{
                 top: 5,
                 right: 30,
@@ -31,7 +36,10 @@ const DynamicComponent = (props: { dynamics: [], selectPid: string[] }) => {
             <Tooltip />
             <Legend />
             {selectPid.map((item, i) => {
-                    return <Line key={item} type="monotone" dataKey={`position${i}`} stroke={chartColors[i]}/>
+                    return <Line key={item} type="monotone" dataKey={`position${i}`}
+                                 stroke={chartColors[i]}
+                                 name={legend[`fio${i}`]}
+                    />
                 }
             )}
         </LineChart>

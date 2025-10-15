@@ -12,11 +12,15 @@ import {
 import {IObjecLiteral} from "../interfaces/interfaces";
 import {chartColors} from "../services/stylesData";
 
-const TimeBarChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[] }) => {
-    const {dynamics, selectedPid} = props
+const TimeBarChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[], legend: IObjecLiteral }) => {
+    const {dynamics, selectedPid, legend} = props
+
     const dynamicsWithoutFirst = (data: any[]) => {
         return data.slice(1)
     }
+
+   console.log(dynamics)
+
     return (
         <div style={{"marginRight": "auto", "marginLeft": "auto", width: 'fit-content'}}>
             <BarChart
@@ -33,12 +37,18 @@ const TimeBarChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[] 
                 <CartesianGrid strokeDasharray="3 3"/>
                 <XAxis dataKey="Name"/>
                 <YAxis/>
-                <Tooltip/>
+                <Tooltip formatter={(value: number, name) => {
+                    let newVal = `${Math.floor(value / 60)}:${value % 60} мин/км`
+
+                    return [newVal, name];
+                }}/>
                 <Legend/>
 
                 {selectedPid.map((item, i) => {
-                        return <Bar key={item} dataKey={`speed${i}`} fill={chartColors[i]}
-                                    activeBar={<Rectangle fill="pink" stroke="blue"/>}/>
+                        return <Bar key={item} dataKey={`speed${i}`}
+                                    name={legend[`fio${i}`]}
+                                    fill={chartColors[i]}
+                                    activeBar={<Rectangle stroke="blue"/>}/>
                     }
                 )}
             </BarChart>

@@ -1,10 +1,10 @@
 //import {dynamics, dynamics2} from "../services/data";
 import DynamicComponent from "../components/dynamic";
 import TimeBarChart from "../components/timeBarChart";
-import {Button, Form, Input, Select} from 'antd';
+import {Button, Form, Input, Select, Radio } from 'antd';
 import {useState} from "react";
 import RaceresultService from "../api/raceresultMethods";
-import {IDistanceSelect, IObjecLiteral, IParticipant} from "../interfaces/interfaces";
+import {IDistanceSelect, ILabelValue, IObjecLiteral, IParticipant} from "../interfaces/interfaces";
 const {Search} = Input;
 
 
@@ -20,6 +20,13 @@ const DrowYouRacePage: any = () => {
     const [selectPid, setSelectPid] = useState<string[]>([]);
     const [splits, setSplit] = useState<{}>([]);
     const [finalSplits, setFinalSplits] = useState<IObjecLiteral[]>([]);
+    const [selectGender, setSelectGender] = useState<string>("all");
+
+    const genderList: ILabelValue[] = [
+        { label: "Все", value: "all" },
+        { label: "Мужчины", value: "male" },
+        { label: "Женщины", value: "female" },
+    ]
 
 
     const handleInputChange = (e: any) => {
@@ -29,6 +36,11 @@ const DrowYouRacePage: any = () => {
     const handleDistanceChange = (e: string) => {
         setSelectedDistance(e)
         setParticipants(transformParticpants(raceList[e]))
+    }
+
+    const handleChangeGender = (e: any) => {
+        setSelectGender(e.target.value)
+        setParticipants(participants.filter(item => item.gender === e.target.value))
     }
 
     const handleSearch = async () => {
@@ -58,6 +70,7 @@ const DrowYouRacePage: any = () => {
             setKey(localStorageData.key);
             setEventName(localStorageData.eventName);
             setRaceList(localStorageData.listData);
+            console.log(localStorageData.listData)
             setDistance(localStorageData.distance);
         }
     }
@@ -99,9 +112,16 @@ const DrowYouRacePage: any = () => {
     }
 
     const transformParticpants = (participants: []): IParticipant[] => {
+
         let participantsSelect: IParticipant[] = [];
         participants.forEach(elem => {
-            participantsSelect.push({name: elem[6], number: elem[0], finish: elem[10], pId: elem[1]})
+            participantsSelect.push({name: elem[6],
+                number: elem[0], finish: elem[10], pId: elem[1],
+                place: elem[2], gPlace: elem[3], chipTime: elem[11],
+                dropDownName: `${elem[2]}. ${elem[6]} | ${elem[11]}`,
+                dropDownGenderName: `${elem[3]} . ${elem[6]} | ${elem[11]}`,
+                gender: elem[4] ? (elem[4] as string).toLowerCase().includes('f') ? "female" : "male" : "",
+            })
         })
         return participantsSelect
     }
@@ -126,6 +146,8 @@ const DrowYouRacePage: any = () => {
                        "Gun0": currentElem.Gun,
                        "position0": currentElem.RO,
                        "speed0": currentElem.Speed ? transformTime(currentElem.Speed) : 0,
+                       "speedString0": currentElem.Speed ? currentElem.Speed : "",
+                       "fio0": participants.find(elem => elem.pId === selectPid[0]).name,
                    }
                }))
            } else {
@@ -135,6 +157,8 @@ const DrowYouRacePage: any = () => {
                    prev[elIndex][`Gun${index}`] = currElem.Gun;
                    prev[elIndex][`position${index}`] = currElem.RO;
                    prev[elIndex][`speed${index}`] = currElem.Speed ? transformTime(currElem.Speed) : 0;
+                   prev[elIndex][`speedString${index}`] = currElem.Speed ? currElem.Speed : "";
+                   prev[elIndex][`fio${index}`] = participants.find(elem => elem.pId === selectPid[index]).name
                })
            }
             return prev
@@ -150,6 +174,19 @@ const DrowYouRacePage: any = () => {
         return value
     }
 
+    const getLegend = (data: any[]): IObjecLiteral => {
+        let legend:IObjecLiteral = {}
+
+        data.forEach((d, i) => {
+            legend[`fio${i}`] = d[`fio${i}`]
+        })
+
+        return legend
+    }
+
+    const filterOption = (input: string, option: IObjecLiteral) => {
+       return  option.children.toLowerCase().includes(input.toLowerCase())
+    };
     return (
         <div className="container">
             <div className={eventName.length === 0 ? '' : 'v-hidden'}>
@@ -180,17 +217,21 @@ const DrowYouRacePage: any = () => {
                         }
 
                         <Form.Item>
+                            <Radio.Group block options={genderList} defaultValue="all" onChange={handleChangeGender}/>
+                        </Form.Item>
+
+                        <Form.Item>
                             <Select
                                 mode="multiple"
                                 allowClear
+                                showSearch
+                                optionFilterProp="children"
+                                filterOption={filterOption}
                                 style={{width: '100%'}}
                                 placeholder="Выберите атлетов"
                                 onChange={handleParticipantsChange}
-                                //defaultValue={['a10', 'c12']}
-                                //onChange={handleChange}
-                                //options={options}
                             >   {participants.map((item: IParticipant) => {
-                                    return <Select.Option value={item.pId} key={item.number}>{item.name}</Select.Option>
+                                    return <Select.Option value={item.pId} key={item.number}>{selectGender === "all" ? item.dropDownName : item.dropDownGenderName}</Select.Option>
                                 }
                             )}
 
@@ -206,8 +247,8 @@ const DrowYouRacePage: any = () => {
 
             {finalSplits.length > 0 && <div>
               <p>Динамика позиций</p>
-              <DynamicComponent dynamics={transformDynamics(finalSplits)} selectPid={selectPid}></DynamicComponent>
-                <TimeBarChart dynamics={transformDynamics(finalSplits)} selectedPid={selectPid}></TimeBarChart>
+              <DynamicComponent dynamics={transformDynamics(finalSplits)} selectPid={selectPid} legend={getLegend(transformDynamics(finalSplits))}></DynamicComponent>
+                <TimeBarChart dynamics={transformDynamics(finalSplits)} selectedPid={selectPid} legend={getLegend(transformDynamics(finalSplits))}></TimeBarChart>
             </div>}
         </div>
     )
