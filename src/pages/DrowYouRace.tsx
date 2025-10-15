@@ -40,7 +40,6 @@ const DrowYouRacePage: any = () => {
 
     const handleChangeGender = (e: any) => {
         setSelectGender(e.target.value)
-        setParticipants(participants.filter(item => item.gender === e.target.value))
     }
 
     const handleSearch = async () => {
@@ -70,7 +69,6 @@ const DrowYouRacePage: any = () => {
             setKey(localStorageData.key);
             setEventName(localStorageData.eventName);
             setRaceList(localStorageData.listData);
-            console.log(localStorageData.listData)
             setDistance(localStorageData.distance);
         }
     }
@@ -230,7 +228,14 @@ const DrowYouRacePage: any = () => {
                                 style={{width: '100%'}}
                                 placeholder="Выберите атлетов"
                                 onChange={handleParticipantsChange}
-                            >   {participants.map((item: IParticipant) => {
+                            >   {participants.filter(item => {
+                                if(selectGender !== 'all'){
+                                    return item.gender === selectGender
+                                } else {
+                                    return true
+                                }
+                               })
+                                .map((item: IParticipant) => {
                                     return <Select.Option value={item.pId} key={item.number}>{selectGender === "all" ? item.dropDownName : item.dropDownGenderName}</Select.Option>
                                 }
                             )}
