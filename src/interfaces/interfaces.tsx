@@ -36,7 +36,6 @@ export interface IRaceResultState {
     raceList: IObjecLiteral[];
     distance: IDistanceSelect[];
     participants: IParticipant[];
-    splits: {};
     finalSplits: IObjecLiteral[];
 };
 
@@ -44,9 +43,4 @@ export type RaceResultAction =
     | { type: 'SET_FIELD'; payload: { field: keyof IRaceResultState; value: any } }
     | { type: 'SET_RACE_ID'; payload: { raceId: string } }
     | { type: 'SET_RACE_DATA'; payload: { raceList: any[]; distance: IDistanceSelect[] } }
-    | { type: 'SET_PARTICIPANTS'; payload: IParticipant[] }
-    | { type: 'SET_SPLITS'; payload: { splits: {}; finalSplits: IObjecLiteral[] } }
-    | { type: 'ADD_SELECTED_PID'; payload: string }
-    | { type: 'REMOVE_SELECTED_PID'; payload: string }
-    | { type: 'CLEAR_SELECTED_PIDS' }
     | { type: 'RESET_FORM' };

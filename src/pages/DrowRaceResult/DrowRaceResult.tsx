@@ -3,78 +3,98 @@ import TimeBarChart from "../../components/timeBarChart";
 import {Button, Form, Input, Select, Radio} from 'antd';
 import {useReducer, useState} from "react";
 import RaceresultService from "../../api/raceresultMethods";
-import {IDistanceSelect, ILabelValue, IObjecLiteral, IParticipant, IRaceResultState} from "../../interfaces/interfaces";
+import {IDistanceSelect, IObjecLiteral, IParticipant, IRaceResultState} from "../../interfaces/interfaces";
 import {initialRaseResultState, raceResultReducer} from "./state";
 import {genderList} from "../../services/data";
 
-const {Search} = Input;
 
+const {Search} = Input;
 
 const DrowRaceResult: any = () => {
     const raceresultService = new RaceresultService();
     const [state, dispatch] = useReducer(raceResultReducer, initialRaseResultState);
-
-    const [raceList, setRaceList] = useState([]);
-    const [distance, setDistance] = useState<IDistanceSelect[]>([]);
-    const [participants, setParticipants] = useState<IParticipant[]>([])
-    const [selectPid, setSelectPid] = useState<string[]>([]);
     const [splits, setSplit] = useState<{}>([]);
-    const [finalSplits, setFinalSplits] = useState<IObjecLiteral[]>([]);
 
 
     const setField = (field: keyof IRaceResultState, value: any) => {
-        dispatch({ type: 'SET_FIELD', payload: { field, value } });
+        dispatch({type: 'SET_FIELD', payload: {field, value}});
     };
 
+    const setRaceData = (raceList: any[], distance: IDistanceSelect[]) => {
+        dispatch({type: 'SET_RACE_DATA', payload: {raceList, distance}});
+    };
+
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        dispatch({type: "SET_RACE_ID", payload: { raceId: e.target.value } });
+        dispatch({type: "SET_RACE_ID", payload: {raceId: e.target.value}});
     };
 
     const handleDistanceChange = (e: string) => {
-        setParticipants(transformParticpants(raceList[e]))
+        setField('participants', transformParticpants(state.raceList[e]))
     }
 
-    const handleChangeGender = (e: React.ChangeEvent<HTMLInputElement>):void => {
+    const handleChangeGender = (e: React.ChangeEvent<HTMLInputElement>): void => {
         setField('selectGender', e.target.value)
     }
 
     const handleSearch = async () => {
-        let localData = localStorage.getItem(state.raceId);
+        //проверка id гонки
+        let transformRaceId = checkRaceId(state.raceId);
+        if (transformRaceId === "") {
+            return
+        }
+
+        let localData = localStorage.getItem(transformRaceId);
         if (!localData) {
             try {
-                const result = await raceresultService.getConfigData(state.raceId);
+                const result = await raceresultService.getConfigData(transformRaceId);
                 if (result.key) {
                     setField('key', result.key);
                     setField('eventName', result.eventname)
-                    const list = await raceresultService.getRaceList(result.key, state.raceId);
-                    setRaceList(list.data)
-                    setDistance(transformDistance(list.data))
+                    const list = await raceresultService.getRaceList(result.key, transformRaceId);
+                    setRaceData(list.data, transformDistance(list.data))
                     const localStorageData = {
                         key: result.key,
                         eventName: result.eventname,
                         distance: transformDistance(list.data),
                         listData: list.data
                     };
-                    localStorage.setItem(state.raceId, JSON.stringify(localStorageData));
+                    localStorage.setItem(transformRaceId, JSON.stringify(localStorageData));
                 }
             } catch (err) {
                 console.error(err)
             }
         } else {
-            const localStorageData = JSON.parse(localStorage.getItem(state.raceId));
+            const localStorageData = JSON.parse(localStorage.getItem(transformRaceId));
             setField('key', localStorageData.key);
             setField('eventName', localStorageData.eventName)
-            setRaceList(localStorageData.listData);
-            setDistance(localStorageData.distance);
+            setRaceData(localStorageData.listData, localStorageData.distance)
         }
     }
 
+    const checkRaceId = (str: string): string => {
+        let transformRaceId = "";
+        if (/^\d{6}$/.test(str)) {
+            transformRaceId = str;
+        } else {
+            if (/\d{6}/.test(str)) {
+                const match = str.match(/\d{6}/);
+                transformRaceId = match[0];
+                dispatch({type: "SET_RACE_ID", payload: {raceId: match[0]}});
+            } else {
+                alert("Гонки по такой ссылке не найдено")
+            }
+        }
+
+        return transformRaceId;
+    }
+
     const handleParticipantsChange = (e: string[]) => {
-        setSelectPid(e)
+        setField('selectPid', e)
     }
 
     const getSplits = async () => {
-        const requests = selectPid.map((elem, index) => {
+        const requests = state.selectPid.map((elem, index) => {
             return {
                 key: `${index}`,
                 fn: () => fetch(`https://my1.raceresult.com/${state.raceId}/RRPublish/data/splits?key=${state.key}&pid=${elem}`).then(r => r.json())
@@ -99,7 +119,7 @@ const DrowRaceResult: any = () => {
             for (let k in finalResults) {
                 finalSplits.push(finalResults[k])
             }
-            setFinalSplits(finalSplits)
+            setField('finalSplits', finalSplits)
         } catch (err) {
             console.error(err)
         }
@@ -142,7 +162,7 @@ const DrowRaceResult: any = () => {
                         "position0": currentElem.RO,
                         "speed0": currentElem.Speed ? transformTime(currentElem.Speed) : 0,
                         "speedString0": currentElem.Speed ? currentElem.Speed : "",
-                        "fio0": participants.find(elem => elem.pId === selectPid[0]).name,
+                        "fio0": state.participants.find(elem => elem.pId === state.selectPid[0]).name,
                     }
                 }))
             } else {
@@ -153,7 +173,7 @@ const DrowRaceResult: any = () => {
                     prev[elIndex][`position${index}`] = currElem.RO;
                     prev[elIndex][`speed${index}`] = currElem.Speed ? transformTime(currElem.Speed) : 0;
                     prev[elIndex][`speedString${index}`] = currElem.Speed ? currElem.Speed : "";
-                    prev[elIndex][`fio${index}`] = participants.find(elem => elem.pId === selectPid[index]).name
+                    prev[elIndex][`fio${index}`] = state.participants.find(elem => elem.pId === state.selectPid[index]).name
                 })
             }
             return prev
@@ -184,25 +204,25 @@ const DrowRaceResult: any = () => {
     };
     return (
         <div className="container">
-            <div className={state.eventName.length === 0 ? '' : 'v-hidden'}>
-                <p>Ссылка на гонку</p>
-                <Search placeholder="id гонки, например 359948"
-                        enterButton="Поиск"
-                        size="large"
-                        onChange={handleInputChange}
-                        onSearch={handleSearch}
-                        value={state.raceId}/>
-            </div>
+            {state.eventName === "" && <div>
+              <p>Ссылка на страницу гонки от RHR на my.raceresult.com или id гонки</p>
+              <Search placeholder="https://my.raceresult.com/308416/ или 359948"
+                      enterButton="Поиск"
+                      size="large"
+                      onChange={handleInputChange}
+                      onSearch={handleSearch}
+                      value={state.raceId}/>
+            </div>}
 
             <div className={state.eventName.length > 0 ? '' : 'v-hidden'}>
                 <h1>{state.eventName}</h1>
 
-                <div className={raceList.length === 0 ? 'v-hidden' : ''}>
+                <div className={state.raceList.length === 0 ? 'v-hidden' : ''}>
                     <Form layout="horizontal">
-                        {distance.length > 0 &&
+                        {state.distance.length > 0 &&
                           <Form.Item label="Дистанция">
                             <Select onChange={handleDistanceChange}>
-                                {distance.map((item: IDistanceSelect) => {
+                                {state.distance.map((item: IDistanceSelect) => {
                                         return <Select.Option value={item.value}
                                                               key={item.value}>{item.label}</Select.Option>
                                     }
@@ -225,7 +245,7 @@ const DrowRaceResult: any = () => {
                                 style={{width: '100%'}}
                                 placeholder="Выберите атлетов"
                                 onChange={handleParticipantsChange}
-                            >   {participants.filter(item => {
+                            >   {state.participants.filter(item => {
                                 if (state.selectGender !== 'all') {
                                     return item.gender === state.selectGender
                                 } else {
@@ -248,12 +268,12 @@ const DrowRaceResult: any = () => {
                 </div>
             </div>
 
-            {finalSplits.length > 0 && <div>
+            {state.finalSplits.length > 0 && <div>
               <p>Динамика позиций</p>
-              <DynamicComponent dynamics={transformDynamics(finalSplits)} selectPid={selectPid}
-                                legend={getLegend(transformDynamics(finalSplits))}></DynamicComponent>
-              <TimeBarChart dynamics={transformDynamics(finalSplits)} selectedPid={selectPid}
-                            legend={getLegend(transformDynamics(finalSplits))}></TimeBarChart>
+              <DynamicComponent dynamics={transformDynamics(state.finalSplits)} selectPid={state.selectPid}
+                                legend={getLegend(transformDynamics(state.finalSplits))}></DynamicComponent>
+              <TimeBarChart dynamics={transformDynamics(state.finalSplits)} selectedPid={state.selectPid}
+                            legend={getLegend(transformDynamics(state.finalSplits))}></TimeBarChart>
             </div>}
         </div>
     )

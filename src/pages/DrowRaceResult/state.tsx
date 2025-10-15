@@ -9,7 +9,6 @@ export const initialRaseResultState: IRaceResultState = {
     raceList: [],
     distance: [],
     participants: [],
-    splits: {},
     finalSplits: []
 };
 
@@ -32,37 +31,6 @@ export const raceResultReducer = (state: IRaceResultState, action: RaceResultAct
                 ...state,
                 raceList: action.payload.raceList,
                 distance: action.payload.distance
-            };
-
-        case 'SET_PARTICIPANTS':
-            return {
-                ...state,
-                participants: action.payload
-            };
-
-        case 'SET_SPLITS':
-            return {
-                ...state,
-                splits: action.payload.splits,
-                finalSplits: action.payload.finalSplits
-            };
-
-        case 'ADD_SELECTED_PID':
-            return {
-                ...state,
-                selectPid: [...state.selectPid, action.payload]
-            };
-
-        case 'REMOVE_SELECTED_PID':
-            return {
-                ...state,
-                selectPid: state.selectPid.filter(pid => pid !== action.payload)
-            };
-
-        case 'CLEAR_SELECTED_PIDS':
-            return {
-                ...state,
-                selectPid: []
             };
 
         case 'RESET_FORM':
