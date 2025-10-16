@@ -5,7 +5,7 @@ import {useReducer, useState} from "react";
 import RaceresultService from "../../api/raceresultMethods";
 import {IDistanceSelect, IObjecLiteral, IParticipant, IRaceResultState} from "../../interfaces/interfaces";
 import {initialRaseResultState, raceResultReducer} from "./state";
-import {genderList} from "../../services/data";
+import {genderList, rasesListRHR} from "../../services/data";
 
 
 const {Search} = Input;
@@ -205,13 +205,27 @@ const DrowRaceResult: any = () => {
     return (
         <div className="container">
             {state.eventName === "" && <div>
-              <p>Ссылка на страницу гонки от RHR на my.raceresult.com или id гонки</p>
-              <Search placeholder="https://my.raceresult.com/308416/ или 359948"
-                      enterButton="Поиск"
-                      size="large"
-                      onChange={handleInputChange}
-                      onSearch={handleSearch}
-                      value={state.raceId}/>
+              <h3 className="rese-header">Ссылка на страницу гонки от RHR на <b>my.raceresult.com</b> или id гонки</h3>
+              <div className="search-input">
+                <Search placeholder="https://my.raceresult.com/308416/ или 359948"
+                        enterButton="Поиск"
+                        size="large"
+                        onChange={handleInputChange}
+                        onSearch={handleSearch}
+                        value={state.raceId}/>
+              </div>
+
+              <h3 className="rese-header">Смотреть недавние гонки</h3>
+
+              <div className="racesList-container">
+                  {rasesListRHR.map((item: {nameRace: string, id: number}, index) => {
+                      return <Button color={"rgb(25,79,128)"} variant="dashed" key={index + item.nameRace}>
+                          {item.nameRace}
+                      </Button>
+                  })
+                  }
+
+              </div>
             </div>}
 
             <div className={state.eventName.length > 0 ? '' : 'v-hidden'}>

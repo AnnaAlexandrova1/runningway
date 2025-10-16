@@ -1,12 +1,18 @@
-import logo from './logo.svg';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import DrowRaceResult from "./pages/DrowRaceResult/DrowRaceResult";
+import Layout from "./components/Layout";
 
 function App() {
   return (
-    <div className="App">
-        <DrowRaceResult></DrowRaceResult>
-    </div>
+      <Router>
+          <Layout>
+              <Routes>
+                  <Route path="/" element={<DrowRaceResult />} />
+              </Routes>
+          </Layout>
+      </Router>
   );
 }
 
