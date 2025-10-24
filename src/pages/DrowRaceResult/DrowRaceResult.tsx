@@ -37,12 +37,27 @@ const DrowRaceResult: any = () => {
         setField('selectGender', e.target.value)
     }
 
-    const handleSearch = async () => {
-        //проверка id гонки
-        let transformRaceId = checkRaceId(state.raceId);
-        if (transformRaceId === "") {
-            return
+    const handleButtonRaceSearch = (id: number): void => {
+        const raseId = String(id);
+        dispatch({type: "SET_RACE_ID", payload: {raceId: raseId},});
+        handleSearch(true, raseId)
+    }
+
+    const handleSearch = async (isFromButton?: boolean, raseId?: string) => {
+        let transformRaceId = '';
+
+        if (!isFromButton) {
+            //проверка id гонки
+
+            transformRaceId = checkRaceId(state.raceId);
+
+            if (transformRaceId === "") {
+                return
+            }
+        } else {
+            transformRaceId = raseId
         }
+
 
         let localData = localStorage.getItem(transformRaceId);
         if (!localData) {
@@ -51,7 +66,19 @@ const DrowRaceResult: any = () => {
                 if (result.key) {
                     setField('key', result.key);
                     setField('eventName', result.eventname)
-                    const list = await raceresultService.getRaceList(result.key, transformRaceId);
+                    let list;
+                    let count = 0;
+                    try {
+                        list = await raceresultService.getRaceList(result.key, transformRaceId);
+                    } catch (error){
+                        console.error(error)
+                        // пробуем на другой url
+                        if(count < 1){
+                            list = await raceresultService.getRaceListFinal(result.key, transformRaceId);
+                        }
+                        count++
+                    }
+
                     setRaceData(list.data, transformDistance(list.data))
                     const localStorageData = {
                         key: result.key,
@@ -61,8 +88,8 @@ const DrowRaceResult: any = () => {
                     };
                     localStorage.setItem(transformRaceId, JSON.stringify(localStorageData));
                 }
-            } catch (err) {
-                console.error(err)
+            } catch (error) {
+                console.error(error)
             }
         } else {
             const localStorageData = JSON.parse(localStorage.getItem(transformRaceId));
@@ -121,7 +148,7 @@ const DrowRaceResult: any = () => {
             }
             setField('finalSplits', finalSplits)
         } catch (err) {
-            console.error(err)
+            console.error(err.code)
         }
     }
 
@@ -211,15 +238,15 @@ const DrowRaceResult: any = () => {
                         enterButton="Поиск"
                         size="large"
                         onChange={handleInputChange}
-                        onSearch={handleSearch}
+                        onSearch={() => handleSearch()}
                         value={state.raceId}/>
               </div>
 
               <h3 className="rese-header">Смотреть недавние гонки</h3>
 
               <div className="racesList-container">
-                  {rasesListRHR.map((item: {nameRace: string, id: number}, index) => {
-                      return <Button color={"rgb(25,79,128)"} variant="dashed" key={index + item.nameRace}>
+                  {rasesListRHR.map((item: { nameRace: string, id: number }, index) => {
+                      return <Button key={index + item.nameRace} onClick={() => handleButtonRaceSearch(item.id)}>
                           {item.nameRace}
                       </Button>
                   })

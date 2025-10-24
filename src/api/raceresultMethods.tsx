@@ -31,6 +31,20 @@ class RaceresultService {
         }
     }
 
+    // GET - получение листа со всеми результатами
+    async getRaceListFinal(key: string, raceId: string) {
+        try {
+            const response = await fetch(`	https://my1.raceresult.com/${raceId}/RRPublish/data/list?key=${key}&listname=Online|Final_circus&page=live&contest=0&r=leaders&l=100000`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            throw error;
+        }
+    }
+
     // GET - получение сплита по атлету
     async getSplit(key: string, raceId: string, pid: string) {
         try {
