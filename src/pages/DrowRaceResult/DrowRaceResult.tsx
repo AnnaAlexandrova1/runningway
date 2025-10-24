@@ -1,11 +1,12 @@
 import DynamicComponent from "../../components/dynamic";
 import TimeBarChart from "../../components/timeBarChart";
-import {Button, Form, Input, Select, Radio} from 'antd';
+import {Button, Form, Input, Select, Radio, FloatButton} from 'antd';
 import {useReducer, useState} from "react";
 import RaceresultService from "../../api/raceresultMethods";
 import {IDistanceSelect, IObjecLiteral, IParticipant, IRaceResultState} from "../../interfaces/interfaces";
 import {initialRaseResultState, raceResultReducer} from "./state";
 import {genderList, rasesListRHR} from "../../services/data";
+import {DownloadOutlined, UnorderedListOutlined} from "@ant-design/icons";
 
 
 const {Search} = Input;
@@ -39,8 +40,12 @@ const DrowRaceResult: any = () => {
 
     const handleButtonRaceSearch = (id: number): void => {
         const raseId = String(id);
-        dispatch({type: "SET_RACE_ID", payload: {raceId: raseId},});
+        dispatch({type: "SET_RACE_ID", payload: {raceId: raseId}});
         handleSearch(true, raseId)
+    }
+
+    const handleBackRasesList = () => {
+        dispatch({type: "RESET_FORM"})
     }
 
     const handleSearch = async (isFromButton?: boolean, raseId?: string) => {
@@ -70,10 +75,10 @@ const DrowRaceResult: any = () => {
                     let count = 0;
                     try {
                         list = await raceresultService.getRaceList(result.key, transformRaceId);
-                    } catch (error){
+                    } catch (error) {
                         console.error(error)
                         // пробуем на другой url
-                        if(count < 1){
+                        if (count < 1) {
                             list = await raceresultService.getRaceListFinal(result.key, transformRaceId);
                         }
                         count++
@@ -232,7 +237,8 @@ const DrowRaceResult: any = () => {
     return (
         <div className="container">
             {state.eventName === "" && <div>
-              <h3 className="rese-header">Ссылка на страницу гонки от RHR на <b>my.raceresult.com</b> или id гонки</h3>
+              <h3 className="rese-header">Ссылка на страницу гонки от RHR на <b>my.raceresult.com</b> или id гонки
+              </h3>
               <div className="search-input">
                 <Search placeholder="https://my.raceresult.com/308416/ или 359948"
                         enterButton="Поиск"
@@ -256,10 +262,19 @@ const DrowRaceResult: any = () => {
             </div>}
 
             <div className={state.eventName.length > 0 ? '' : 'v-hidden'}>
-                <h1>{state.eventName}</h1>
+                <div style={{position: "relative"}}>
+                    <h1 className="rese-header">{state.eventName}</h1>
+                    {state.eventName.length > 0 &&
+                      <Button type="primary" icon={<UnorderedListOutlined/>} size={25} className="race-back-button"
+                              color="default" variant="outlined" onClick={handleBackRasesList}>
+                        Другие гонки
+                      </Button>
+                    }
+                </div>
+
 
                 <div className={state.raceList.length === 0 ? 'v-hidden' : ''}>
-                    <Form layout="horizontal">
+                    <Form layout="horizontal" className="race-form">
                         {state.distance.length > 0 &&
                           <Form.Item label="Дистанция">
                             <Select onChange={handleDistanceChange}>
@@ -273,7 +288,8 @@ const DrowRaceResult: any = () => {
                         }
 
                         <Form.Item>
-                            <Radio.Group block options={genderList} defaultValue="all" onChange={handleChangeGender}/>
+                            <Radio.Group block options={genderList} defaultValue="all"
+                                         onChange={handleChangeGender}/>
                         </Form.Item>
 
                         <Form.Item>
@@ -303,7 +319,7 @@ const DrowRaceResult: any = () => {
                         </Form.Item>
 
                         <Form.Item>
-                            <Button onClick={getSplits}>Сравнить</Button>
+                            <Button onClick={getSplits} color="primary" variant="solid">Сравнить</Button>
                         </Form.Item>
                     </Form>
                 </div>

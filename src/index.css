@@ -77,3 +77,19 @@ header {
   margin-left: auto;
   margin-right: auto;
 }
+
+.race-form {
+  margin-top: 20px;
+}
+
+.ant-form-item-control-input-content {
+  display: flex;
+  justify-content: center;
+}
+
+.race-back-button {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  /*top: 30px;*/
+}
