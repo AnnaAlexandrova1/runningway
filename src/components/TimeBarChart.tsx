@@ -19,8 +19,6 @@ const TimeBarChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[],
         return data.slice(1)
     }
 
-   console.log(dynamics)
-
     return (
         <div style={{"marginRight": "auto", "marginLeft": "auto", width: 'fit-content'}}>
             <BarChart
@@ -38,7 +36,7 @@ const TimeBarChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[],
                 <XAxis dataKey="Name"/>
                 <YAxis/>
                 <Tooltip formatter={(value: number, name) => {
-                    let newVal = `${Math.floor(value / 60)}:${value % 60} мин/км`
+                    let newVal = `${Math.floor(value / 60)}:${('0' + (value % 60)).slice(-2)} мин/км`
 
                     return [newVal, name];
                 }}/>

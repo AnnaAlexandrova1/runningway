@@ -2,6 +2,8 @@ import {IRaceResultState, RaceResultAction} from "../../interfaces/interfaces";
 
 export const initialRaseResultState: IRaceResultState = {
     key: "",
+    isLoading: false,
+    isError: false,
     raceId: null,
     eventName: "",
     selectGender: "all",

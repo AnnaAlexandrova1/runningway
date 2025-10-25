@@ -29,6 +29,8 @@ export interface ILabelValue {
 
 export interface IRaceResultState {
     key: string;
+    isLoading: boolean;
+    isError: boolean;
     raceId: string;
     eventName: string;
     selectGender: string;

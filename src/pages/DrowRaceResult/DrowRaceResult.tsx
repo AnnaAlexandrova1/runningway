@@ -1,18 +1,22 @@
-import DynamicComponent from "../../components/dynamic";
-import TimeBarChart from "../../components/timeBarChart";
-import {Button, Form, Input, Select, Radio, FloatButton} from 'antd';
+import DynamicComponent from "../../components/Dynamic";
+import TimeBarChart from "../../components/TimeBarChart";
+import {Button, Form, Input, Select, Radio, Tooltip} from 'antd';
 import {useReducer, useState} from "react";
-import RaceresultService from "../../api/raceresultMethods";
+import RaceResultService from "../../api/RaceResultService";
 import {IDistanceSelect, IObjecLiteral, IParticipant, IRaceResultState} from "../../interfaces/interfaces";
 import {initialRaseResultState, raceResultReducer} from "./state";
 import {genderList, rasesListRHR} from "../../services/data";
 import {DownloadOutlined, UnorderedListOutlined} from "@ant-design/icons";
+import Loader from "../../components/Loader";
+import Error from "../../components/Error";
+
+;
 
 
 const {Search} = Input;
 
 const DrowRaceResult: any = () => {
-    const raceresultService = new RaceresultService();
+    const raceresultService = new RaceResultService();
     const [state, dispatch] = useReducer(raceResultReducer, initialRaseResultState);
     const [splits, setSplit] = useState<{}>([]);
 
@@ -67,6 +71,7 @@ const DrowRaceResult: any = () => {
         let localData = localStorage.getItem(transformRaceId);
         if (!localData) {
             try {
+                setField('isLoading', true);
                 const result = await raceresultService.getConfigData(transformRaceId);
                 if (result.key) {
                     setField('key', result.key);
@@ -95,6 +100,10 @@ const DrowRaceResult: any = () => {
                 }
             } catch (error) {
                 console.error(error)
+                setField('isError', true);
+                setField('isLoading', false);
+            } finally {
+                setField('isLoading', false);
             }
         } else {
             const localStorageData = JSON.parse(localStorage.getItem(transformRaceId));
@@ -135,6 +144,7 @@ const DrowRaceResult: any = () => {
 
 
         try {
+            setField('isLoading', true);
             const finalResults: IObjecLiteral = await requests.reduce(async (previousPromise, {key, fn}) => {
                 const accumulatedResults = await previousPromise;
                 const result: { Splits: any[] } = await fn();
@@ -154,6 +164,10 @@ const DrowRaceResult: any = () => {
             setField('finalSplits', finalSplits)
         } catch (err) {
             console.error(err.code)
+            setField('isLoading', false);
+            setField('isError', true);
+        } finally {
+            setField('isLoading', false);
         }
     }
 
@@ -235,73 +249,73 @@ const DrowRaceResult: any = () => {
         return option.children.toLowerCase().includes(input.toLowerCase())
     };
     return (
-        <div className="container">
-            {state.eventName === "" && <div>
-              <h3 className="rese-header">Ссылка на страницу гонки от RHR на <b>my.raceresult.com</b> или id гонки
-              </h3>
-              <div className="search-input">
-                <Search placeholder="https://my.raceresult.com/308416/ или 359948"
-                        enterButton="Поиск"
-                        size="large"
-                        onChange={handleInputChange}
-                        onSearch={() => handleSearch()}
-                        value={state.raceId}/>
-              </div>
+        <div className="content-container" style={{border: "1px solid black"}}>
+            {!state.isError && <div>
+                {state.eventName === "" && !state.isLoading && <div>
+                  <h3 className="rese-header">Ссылка на страницу гонки от RHR на <b>my.raceresult.com</b> или id гонки
+                  </h3>
+                  <div className="search-input">
+                    <Search placeholder="https://my.raceresult.com/308416/ или 359948"
+                            enterButton="Поиск"
+                            size="large"
+                            onChange={handleInputChange}
+                            onSearch={() => handleSearch()}
+                            value={state.raceId}/>
+                  </div>
 
-              <h3 className="rese-header">Смотреть недавние гонки</h3>
+                  <h3 className="rese-header">Смотреть недавние гонки</h3>
 
-              <div className="racesList-container">
-                  {rasesListRHR.map((item: { nameRace: string, id: number }, index) => {
-                      return <Button key={index + item.nameRace} onClick={() => handleButtonRaceSearch(item.id)}>
-                          {item.nameRace}
-                      </Button>
-                  })
-                  }
+                  <div className="racesList-container">
+                      {rasesListRHR.map((item: { nameRace: string, id: number }, index) => {
+                          return <Button key={index + item.nameRace} onClick={() => handleButtonRaceSearch(item.id)}>
+                              {item.nameRace}
+                          </Button>
+                      })
+                      }
 
-              </div>
-            </div>}
+                  </div>
+                </div>}
 
-            <div className={state.eventName.length > 0 ? '' : 'v-hidden'}>
-                <div style={{position: "relative"}}>
+                {state.eventName.length > 0 && <div>
+                  <div style={{position: "relative"}}>
                     <h1 className="rese-header">{state.eventName}</h1>
-                    {state.eventName.length > 0 &&
-                      <Button type="primary" icon={<UnorderedListOutlined/>} size={25} className="race-back-button"
-                              color="default" variant="outlined" onClick={handleBackRasesList}>
-                        Другие гонки
-                      </Button>
-                    }
-                </div>
+                      {state.eventName.length > 0 &&
+                        <Button type="primary" icon={<UnorderedListOutlined/>} size={25} className="race-back-button"
+                                color="default" variant="outlined" onClick={handleBackRasesList}>
+                          Другие гонки
+                        </Button>
+                      }
+                  </div>
+
+                      <Form layout="horizontal" className="race-form">
+                          {state.distance.length > 0 &&
+                            <Form.Item className="distance-container">
+                              <Select onChange={handleDistanceChange} placeholder="Дистанция">
+                                  {state.distance.map((item: IDistanceSelect) => {
+                                          return <Select.Option value={item.value}
+                                                                key={item.value}>{item.label}</Select.Option>
+                                      }
+                                  )}
+                              </Select>
+                            </Form.Item>
+                          }
 
 
-                <div className={state.raceList.length === 0 ? 'v-hidden' : ''}>
-                    <Form layout="horizontal" className="race-form">
-                        {state.distance.length > 0 &&
-                          <Form.Item label="Дистанция">
-                            <Select onChange={handleDistanceChange}>
-                                {state.distance.map((item: IDistanceSelect) => {
-                                        return <Select.Option value={item.value}
-                                                              key={item.value}>{item.label}</Select.Option>
-                                    }
-                                )}
-                            </Select>
-                          </Form.Item>
-                        }
-
-                        <Form.Item>
+                          {state.participants.length > 0 && <Form.Item>
                             <Radio.Group block options={genderList} defaultValue="all"
                                          onChange={handleChangeGender}/>
-                        </Form.Item>
+                          </Form.Item>}
 
-                        <Form.Item>
+                          {state.participants.length > 0 && <Form.Item>
                             <Select
-                                mode="multiple"
-                                allowClear
-                                showSearch
-                                optionFilterProp="children"
-                                filterOption={filterOption}
-                                style={{width: '100%'}}
-                                placeholder="Выберите атлетов"
-                                onChange={handleParticipantsChange}
+                              mode="multiple"
+                              allowClear
+                              showSearch
+                              optionFilterProp="children"
+                              filterOption={filterOption}
+                              style={{width: '100%'}}
+                              placeholder="Выберите атлетов"
+                              onChange={handleParticipantsChange}
                             >   {state.participants.filter(item => {
                                 if (state.selectGender !== 'all') {
                                     return item.gender === state.selectGender
@@ -316,22 +330,33 @@ const DrowRaceResult: any = () => {
                                 )}
 
                             </Select>
-                        </Form.Item>
+                          </Form.Item>}
 
-                        <Form.Item>
-                            <Button onClick={getSplits} color="primary" variant="solid">Сравнить</Button>
-                        </Form.Item>
-                    </Form>
-                </div>
-            </div>
+                          {state.distance.length > 0 && <Form.Item>
+                            <Tooltip title={state.selectPid.length === 0 ? "Неободимо выбрать атлетов" : ""}>
+                              <Button onClick={getSplits} color="primary" variant="solid"
+                                      disabled={state.selectPid.length === 0}>Сравнить</Button>
+                            </Tooltip>
+                          </Form.Item>}
+                      </Form>
+                    {state.isLoading && <Loader/>}
+                </div>}
 
-            {state.finalSplits.length > 0 && <div>
-              <p>Динамика позиций</p>
-              <DynamicComponent dynamics={transformDynamics(state.finalSplits)} selectPid={state.selectPid}
-                                legend={getLegend(transformDynamics(state.finalSplits))}></DynamicComponent>
-              <TimeBarChart dynamics={transformDynamics(state.finalSplits)} selectedPid={state.selectPid}
-                            legend={getLegend(transformDynamics(state.finalSplits))}></TimeBarChart>
+
+
+                {state.finalSplits.length > 0 && <div>
+                  <p>Динамика позиций</p>
+
+                    {!state.isLoading && <div>
+                  <DynamicComponent dynamics={transformDynamics(state.finalSplits)} selectPid={state.selectPid}
+                                    legend={getLegend(transformDynamics(state.finalSplits))}></DynamicComponent>
+                  <TimeBarChart dynamics={transformDynamics(state.finalSplits)} selectedPid={state.selectPid}
+                                legend={getLegend(transformDynamics(state.finalSplits))}></TimeBarChart>
+                  </div>}
+                </div>}
             </div>}
+
+            {state.isError && <Error/>}
         </div>
     )
 }

@@ -9,7 +9,7 @@ const Layout: React.FC<{ children?: React.ReactNode }>  = ({ children }: LayoutP
     return (
         <div className="layout">
             <Header/>
-            <main className="main-container">
+            <main className="main-container" style={{border: "1px solid orange"}}>
                 {children}
             </main>
         </div>

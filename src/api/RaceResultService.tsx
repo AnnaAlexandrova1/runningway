@@ -1,6 +1,6 @@
-class RaceresultService {
-    constructor() {
 
+class RaceResultService {
+    constructor() {
     }
 
     // GET - получение конфига
@@ -62,4 +62,4 @@ class RaceresultService {
 
 }
 
-export default RaceresultService;
+export default RaceResultService;
