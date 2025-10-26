@@ -5,17 +5,14 @@ import {useReducer, useState} from "react";
 import RaceResultService from "../../api/RaceResultService";
 import {IDistanceSelect, IObjecLiteral, IParticipant, IRaceResultState} from "../../interfaces/interfaces";
 import {initialRaseResultState, raceResultReducer} from "./state";
-import {genderList, rasesListRHR} from "../../services/data";
+import {genderList, rasesListRHR} from "../../configData/data";
 import {DownloadOutlined, UnorderedListOutlined} from "@ant-design/icons";
 import Loader from "../../components/Loader";
 import Error from "../../components/Error";
 
-;
-
-
 const {Search} = Input;
 
-const DrowRaceResult: any = () => {
+const DrowRaceResult = () => {
     const raceresultService = new RaceResultService();
     const [state, dispatch] = useReducer(raceResultReducer, initialRaseResultState);
     const [splits, setSplit] = useState<{}>([]);
@@ -35,11 +32,15 @@ const DrowRaceResult: any = () => {
     };
 
     const handleDistanceChange = (e: string) => {
-        setField('participants', transformParticpants(state.raceList[e]))
+        setField('participants', transformParticpants(state.raceList[e]));
+        setField('finalSplits', [])
+        setField('selectPid', [])
     }
 
     const handleChangeGender = (e: React.ChangeEvent<HTMLInputElement>): void => {
-        setField('selectGender', e.target.value)
+        setField('selectGender', e.target.value);
+        setField('finalSplits', [])
+        setField('selectPid', [])
     }
 
     const handleButtonRaceSearch = (id: number): void => {
@@ -132,6 +133,7 @@ const DrowRaceResult: any = () => {
 
     const handleParticipantsChange = (e: string[]) => {
         setField('selectPid', e)
+        setField('finalSplits', [])
     }
 
     const getSplits = async () => {
@@ -249,9 +251,9 @@ const DrowRaceResult: any = () => {
         return option.children.toLowerCase().includes(input.toLowerCase())
     };
     return (
-        <div className="content-container" style={{border: "1px solid black"}}>
+        <div className="content-container">
             {!state.isError && <div>
-                {state.eventName === "" && !state.isLoading && <div>
+                {state.eventName === "" && !state.isLoading && <div className="start-container">
                   <h3 className="rese-header">Ссылка на страницу гонки от RHR на <b>my.raceresult.com</b> или id гонки
                   </h3>
                   <div className="search-input">
@@ -290,7 +292,7 @@ const DrowRaceResult: any = () => {
                       <Form layout="horizontal" className="race-form">
                           {state.distance.length > 0 &&
                             <Form.Item className="distance-container">
-                              <Select onChange={handleDistanceChange} placeholder="Дистанция">
+                              <Select onChange={handleDistanceChange} placeholder="Выбрать дистанцию">
                                   {state.distance.map((item: IDistanceSelect) => {
                                           return <Select.Option value={item.value}
                                                                 key={item.value}>{item.label}</Select.Option>
@@ -313,8 +315,9 @@ const DrowRaceResult: any = () => {
                               showSearch
                               optionFilterProp="children"
                               filterOption={filterOption}
-                              style={{width: '100%'}}
+                              style={{width: '1200px'}}
                               placeholder="Выберите атлетов"
+                              value={state.selectPid}
                               onChange={handleParticipantsChange}
                             >   {state.participants.filter(item => {
                                 if (state.selectGender !== 'all') {
@@ -332,7 +335,7 @@ const DrowRaceResult: any = () => {
                             </Select>
                           </Form.Item>}
 
-                          {state.distance.length > 0 && <Form.Item>
+                          {state.distance.length > 0 && state.participants.length > 0 && <Form.Item>
                             <Tooltip title={state.selectPid.length === 0 ? "Неободимо выбрать атлетов" : ""}>
                               <Button onClick={getSplits} color="primary" variant="solid"
                                       disabled={state.selectPid.length === 0}>Сравнить</Button>
@@ -345,8 +348,6 @@ const DrowRaceResult: any = () => {
 
 
                 {state.finalSplits.length > 0 && <div>
-                  <p>Динамика позиций</p>
-
                     {!state.isLoading && <div>
                   <DynamicComponent dynamics={transformDynamics(state.finalSplits)} selectPid={state.selectPid}
                                     legend={getLegend(transformDynamics(state.finalSplits))}></DynamicComponent>

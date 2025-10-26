@@ -10,7 +10,7 @@ import {
     Legend,
 } from 'recharts';
 import {IObjecLiteral} from "../interfaces/interfaces";
-import {chartColors} from "../services/stylesData";
+import {chartColors} from "../configData/stylesData";
 
 const TimeBarChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[], legend: IObjecLiteral }) => {
     const {dynamics, selectedPid, legend} = props
@@ -20,9 +20,10 @@ const TimeBarChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[],
     }
 
     return (
-        <div style={{"marginRight": "auto", "marginLeft": "auto", width: 'fit-content'}}>
+        <div className='diagrams-container'>
+            <h3 className="diagrams-name">Среднее время на отрезках</h3>
             <BarChart
-                width={1200}
+                width={Math.max(window.innerWidth * 0.88, 1200)}
                 height={500}
                 data={dynamicsWithoutFirst(dynamics)}
                 margin={{
@@ -31,6 +32,7 @@ const TimeBarChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[],
                     left: 20,
                     bottom: 5,
                 }}
+                className="diagram"
             >
                 <CartesianGrid strokeDasharray="3 3"/>
                 <XAxis dataKey="Name"/>

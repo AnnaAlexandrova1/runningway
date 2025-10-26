@@ -46,3 +46,9 @@ export type RaceResultAction =
     | { type: 'SET_RACE_ID'; payload: { raceId: string } }
     | { type: 'SET_RACE_DATA'; payload: { raceList: any[]; distance: IDistanceSelect[] } }
     | { type: 'RESET_FORM' };
+
+export interface IRouteElement {
+    path: string;
+    component: React.ReactElement;
+    protected_route?: boolean;
+}
