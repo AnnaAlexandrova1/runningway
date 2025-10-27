@@ -254,7 +254,7 @@ const DrowRaceResult = () => {
         <div className="content-container">
             {!state.isError && <div>
                 {state.eventName === "" && !state.isLoading && <div className="start-container">
-                  <h3 className="rese-header">Ссылка на страницу гонки от RHR на <b>my.raceresult.com</b> или id гонки
+                  <h3 className="race-header">Ссылка на страницу гонки от RHR на <b>my.raceresult.com</b> или id гонки
                   </h3>
                   <div className="search-input">
                     <Search placeholder="https://my.raceresult.com/308416/ или 359948"
@@ -265,7 +265,7 @@ const DrowRaceResult = () => {
                             value={state.raceId}/>
                   </div>
 
-                  <h3 className="rese-header">Смотреть недавние гонки</h3>
+                  <h3 className="race-header">Смотреть недавние гонки</h3>
 
                   <div className="racesList-container">
                       {rasesListRHR.map((item: { nameRace: string, id: number }, index) => {
@@ -280,7 +280,7 @@ const DrowRaceResult = () => {
 
                 {state.eventName.length > 0 && <div>
                   <div style={{position: "relative"}}>
-                    <h1 className="rese-header">{state.eventName}</h1>
+                    <h1 className="race-header">{state.eventName}</h1>
                       {state.eventName.length > 0 &&
                         <Button type="primary" icon={<UnorderedListOutlined/>} size={25} className="race-back-button"
                                 color="default" variant="outlined" onClick={handleBackRasesList}>
