@@ -39,6 +39,7 @@ export interface IRaceResultState {
     distance: IDistanceSelect[];
     participants: IParticipant[];
     finalSplits: IObjecLiteral[];
+    transformDynamics: IObjecLiteral[];
 };
 
 export type RaceResultAction =

@@ -15,6 +15,8 @@ const DynamicComponent = (props: { dynamics: [], selectPid: string[], legend: IO
         return data.slice(1)
     }
 
+    console.log(dynamics)
+
     return (
         <div className='diagrams-container'>
             <h3 className="diagrams-name">Динамика позиций</h3>
@@ -23,10 +25,11 @@ const DynamicComponent = (props: { dynamics: [], selectPid: string[], legend: IO
                 height={600}
                 data={dynamicsWithoutFirst(dynamics)}
                 className="diagram"
+
             >
                 <CartesianGrid strokeDasharray="3 3"/>
-                <XAxis dataKey="Name"/>
-                <YAxis/>
+                <XAxis dataKey="NameForChart" domain={[15, 20]} allowDataOverflow/>
+                <YAxis minTickGap={2}/>
                 <Tooltip/>
                 <Legend/>
                 {selectPid.map((item, i) => {

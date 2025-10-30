@@ -9,6 +9,7 @@ import {genderList, rasesListRHR, years} from "../../configData/data";
 import {DownloadOutlined, UnorderedListOutlined} from "@ant-design/icons";
 import Loader from "../../components/Loader";
 import Error from "../../components/Error";
+import dynamic from "../../components/Dynamic";
 
 const {Search} = Input;
 
@@ -164,6 +165,7 @@ const DrowRaceResult = () => {
                 finalSplits.push(finalResults[k])
             }
             setField('finalSplits', finalSplits)
+            setField('transformDynamics', transformDynamics(finalSplits as []))
         } catch (err) {
             console.error(err.code)
             setField('isLoading', false);
@@ -198,14 +200,18 @@ const DrowRaceResult = () => {
         return distance
     }
 
+    const getLength = (length: number) => {
+        return length > 8 ? 18 : 25
+    }
+
     const transformDynamics = (dynamics: []): IObjecLiteral[] => {
-        console.log(dynamics)
         // @ts-ignore
         const runners: IObjecLiteral[] = dynamics.reduce((prev: IObjecLiteral[], curr: IObjecLiteral[], index) => {
             if (index === 0) {
-                prev = prev.concat(curr.map(currentElem => {
+                prev = prev.concat(curr.map((currentElem, curIndex: number) => {
                     return {
                         Name: currentElem.Name,
+                        NameForChart: (currentElem.Name).slice(0, curIndex === 1 ? 5 : getLength(curr.length)),
                         "Exists0": currentElem.Exists,
                         "Gun0": currentElem.Gun,
                         "position0": state.selectGender === 'all' ? currentElem.RO : currentElem.RG,
@@ -357,10 +363,10 @@ const DrowRaceResult = () => {
 
                 {state.finalSplits.length > 0 && <div>
                     {!state.isLoading && <div>
-                      <DynamicComponent dynamics={transformDynamics(state.finalSplits)} selectPid={state.selectPid}
-                                        legend={getLegend(transformDynamics(state.finalSplits))}></DynamicComponent>
-                      <TimeBarChart dynamics={transformDynamics(state.finalSplits)} selectedPid={state.selectPid}
-                                    legend={getLegend(transformDynamics(state.finalSplits))}></TimeBarChart>
+                      <DynamicComponent dynamics={state.transformDynamics} selectPid={state.selectPid}
+                                        legend={getLegend(state.transformDynamics)}></DynamicComponent>
+                      <TimeBarChart dynamics={state.transformDynamics} selectedPid={state.selectPid}
+                                    legend={getLegend(state.transformDynamics)}></TimeBarChart>
                     </div>}
                 </div>}
             </div>}

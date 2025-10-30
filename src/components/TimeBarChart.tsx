@@ -36,7 +36,7 @@ const TimeBarChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[],
             >
                 <CartesianGrid strokeDasharray="3 3"/>
                 <XAxis dataKey="Name"/>
-                <YAxis/>
+                <YAxis hide={true}/>
                 <Tooltip formatter={(value: number, name) => {
                     let newVal = `${Math.floor(value / 60)}:${('0' + (value % 60)).slice(-2)} мин/км`
 

@@ -11,7 +11,8 @@ export const initialRaseResultState: IRaceResultState = {
     raceList: [],
     distance: [],
     participants: [],
-    finalSplits: []
+    finalSplits: [],
+    transformDynamics: [],
 };
 
 export const raceResultReducer = (state: IRaceResultState, action: RaceResultAction): IRaceResultState => {

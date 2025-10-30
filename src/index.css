@@ -219,3 +219,7 @@ header {
     font-size: 19px;
     cursor: pointer;
 }
+
+.recharts-text.recharts-cartesian-axis-tick-value {
+    white-space: pre-line;
+}
