@@ -52,3 +52,9 @@ export interface IRouteElement {
     component: React.ReactElement;
     protected_route?: boolean;
 }
+
+export interface IRaceRHR {
+    nameRace: string;
+    id: number;
+    year: string;
+}

@@ -1,11 +1,11 @@
 import DynamicComponent from "../../components/Dynamic";
 import TimeBarChart from "../../components/TimeBarChart";
-import {Button, Form, Input, Select, Radio, Tooltip} from 'antd';
+import {Button, Form, Input, Select, Radio, Tooltip, Col, Row} from 'antd';
 import {useReducer, useState} from "react";
 import RaceResultService from "../../api/RaceResultService";
-import {IDistanceSelect, IObjecLiteral, IParticipant, IRaceResultState} from "../../interfaces/interfaces";
+import {IDistanceSelect, IObjecLiteral, IParticipant, IRaceResultState, IRaceRHR} from "../../interfaces/interfaces";
 import {initialRaseResultState, raceResultReducer} from "./state";
-import {genderList, rasesListRHR} from "../../configData/data";
+import {genderList, rasesListRHR, years} from "../../configData/data";
 import {DownloadOutlined, UnorderedListOutlined} from "@ant-design/icons";
 import Loader from "../../components/Loader";
 import Error from "../../components/Error";
@@ -199,6 +199,7 @@ const DrowRaceResult = () => {
     }
 
     const transformDynamics = (dynamics: []): IObjecLiteral[] => {
+        console.log(dynamics)
         // @ts-ignore
         const runners: IObjecLiteral[] = dynamics.reduce((prev: IObjecLiteral[], curr: IObjecLiteral[], index) => {
             if (index === 0) {
@@ -207,7 +208,7 @@ const DrowRaceResult = () => {
                         Name: currentElem.Name,
                         "Exists0": currentElem.Exists,
                         "Gun0": currentElem.Gun,
-                        "position0": currentElem.RO,
+                        "position0": state.selectGender === 'all' ? currentElem.RO : currentElem.RG,
                         "speed0": currentElem.Speed ? transformTime(currentElem.Speed) : 0,
                         "speedString0": currentElem.Speed ? currentElem.Speed : "",
                         "fio0": state.participants.find(elem => elem.pId === state.selectPid[0]).name,
@@ -218,7 +219,7 @@ const DrowRaceResult = () => {
                     let currElem = curr.find((item: IObjecLiteral) => item.Name === el.Name);
                     prev[elIndex][`Exists${index}`] = currElem.Exists;
                     prev[elIndex][`Gun${index}`] = currElem.Gun;
-                    prev[elIndex][`position${index}`] = currElem.RO;
+                    prev[elIndex][`position${index}`] = state.selectGender === 'all' ? currElem.RO : currElem.RG;
                     prev[elIndex][`speed${index}`] = currElem.Speed ? transformTime(currElem.Speed) : 0;
                     prev[elIndex][`speedString${index}`] = currElem.Speed ? currElem.Speed : "";
                     prev[elIndex][`fio${index}`] = state.participants.find(elem => elem.pId === state.selectPid[index]).name
@@ -268,12 +269,19 @@ const DrowRaceResult = () => {
                   <h3 className="race-header">Смотреть недавние гонки</h3>
 
                   <div className="racesList-container">
-                      {rasesListRHR.map((item: { nameRace: string, id: number }, index) => {
-                          return <Button key={index + item.nameRace} onClick={() => handleButtonRaceSearch(item.id)}>
-                              {item.nameRace}
-                          </Button>
-                      })
-                      }
+                      {years.map(year => {
+                        return  <div key={year} className="racesList-container-year">
+                              <h4>{year}</h4>
+
+                            {rasesListRHR.filter(item => item.year === year).map((item: IRaceRHR, index) => {
+                                return <Button key={index + item.nameRace} onClick={() => handleButtonRaceSearch(item.id)}>
+                                    {item.nameRace}
+                                </Button>
+                            })
+                            }
+                          </div>
+                      })}
+
 
                   </div>
                 </div>}
@@ -289,71 +297,71 @@ const DrowRaceResult = () => {
                       }
                   </div>
 
-                      <Form layout="horizontal" className="race-form">
-                          {state.distance.length > 0 &&
-                            <Form.Item className="distance-container">
-                              <Select onChange={handleDistanceChange} placeholder="Выбрать дистанцию">
-                                  {state.distance.map((item: IDistanceSelect) => {
-                                          return <Select.Option value={item.value}
-                                                                key={item.value}>{item.label}</Select.Option>
-                                      }
-                                  )}
-                              </Select>
-                            </Form.Item>
-                          }
+                  <Form layout="horizontal" className="race-form">
+                      {state.distance.length > 0 &&
+                        <Form.Item className="distance-container">
+                          <Select onChange={handleDistanceChange} placeholder="Выбрать дистанцию">
+                              {state.distance.map((item: IDistanceSelect) => {
+                                      return <Select.Option value={item.value}
+                                                            key={item.value}>{item.label}</Select.Option>
+                                  }
+                              )}
+                          </Select>
+                        </Form.Item>
+                      }
 
 
-                          {state.participants.length > 0 && <Form.Item>
-                            <Radio.Group block options={genderList} defaultValue="all"
-                                         onChange={handleChangeGender}/>
-                          </Form.Item>}
+                      {state.participants.length > 0 && <Form.Item>
+                        <Radio.Group block options={genderList} defaultValue="all"
+                                     onChange={handleChangeGender}/>
+                      </Form.Item>}
 
-                          {state.participants.length > 0 && <Form.Item>
-                            <Select
-                              mode="multiple"
-                              allowClear
-                              showSearch
-                              optionFilterProp="children"
-                              filterOption={filterOption}
-                              style={{width: '1200px'}}
-                              placeholder="Выберите атлетов"
-                              value={state.selectPid}
-                              onChange={handleParticipantsChange}
-                            >   {state.participants.filter(item => {
-                                if (state.selectGender !== 'all') {
-                                    return item.gender === state.selectGender
-                                } else {
-                                    return true
+                      {state.participants.length > 0 && <Form.Item>
+                        <Select
+                          mode="multiple"
+                          allowClear
+                          showSearch
+                          maxCount={10}
+                          optionFilterProp="children"
+                          filterOption={filterOption}
+                          style={{width: '1200px'}}
+                          placeholder="Выберите атлетов (не более 10)"
+                          value={state.selectPid}
+                          onChange={handleParticipantsChange}
+                        >   {state.participants.filter(item => {
+                            if (state.selectGender !== 'all') {
+                                return item.gender === state.selectGender
+                            } else {
+                                return true
+                            }
+                        })
+                            .map((item: IParticipant) => {
+                                    return <Select.Option value={item.pId}
+                                                          key={item.number}>{state.selectGender === "all" ? item.dropDownName : item.dropDownGenderName}</Select.Option>
                                 }
-                            })
-                                .map((item: IParticipant) => {
-                                        return <Select.Option value={item.pId}
-                                                              key={item.number}>{state.selectGender === "all" ? item.dropDownName : item.dropDownGenderName}</Select.Option>
-                                    }
-                                )}
+                            )}
 
-                            </Select>
-                          </Form.Item>}
+                        </Select>
+                      </Form.Item>}
 
-                          {state.distance.length > 0 && state.participants.length > 0 && <Form.Item>
-                            <Tooltip title={state.selectPid.length === 0 ? "Неободимо выбрать атлетов" : ""}>
-                              <Button onClick={getSplits} color="primary" variant="solid"
-                                      disabled={state.selectPid.length === 0}>Сравнить</Button>
-                            </Tooltip>
-                          </Form.Item>}
-                      </Form>
+                      {state.distance.length > 0 && state.participants.length > 0 && <Form.Item>
+                        <Tooltip title={state.selectPid.length === 0 ? "Неободимо выбрать атлетов" : ""}>
+                          <Button onClick={getSplits} color="primary" variant="solid"
+                                  disabled={state.selectPid.length === 0}>Сравнить</Button>
+                        </Tooltip>
+                      </Form.Item>}
+                  </Form>
                     {state.isLoading && <Loader/>}
                 </div>}
 
 
-
                 {state.finalSplits.length > 0 && <div>
                     {!state.isLoading && <div>
-                  <DynamicComponent dynamics={transformDynamics(state.finalSplits)} selectPid={state.selectPid}
-                                    legend={getLegend(transformDynamics(state.finalSplits))}></DynamicComponent>
-                  <TimeBarChart dynamics={transformDynamics(state.finalSplits)} selectedPid={state.selectPid}
-                                legend={getLegend(transformDynamics(state.finalSplits))}></TimeBarChart>
-                  </div>}
+                      <DynamicComponent dynamics={transformDynamics(state.finalSplits)} selectPid={state.selectPid}
+                                        legend={getLegend(transformDynamics(state.finalSplits))}></DynamicComponent>
+                      <TimeBarChart dynamics={transformDynamics(state.finalSplits)} selectedPid={state.selectPid}
+                                    legend={getLegend(transformDynamics(state.finalSplits))}></TimeBarChart>
+                    </div>}
                 </div>}
             </div>}
 
