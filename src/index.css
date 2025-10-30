@@ -134,7 +134,7 @@ header {
 
 .race-back-button {
     position: absolute;
-    right: 0;
+    right: 15%;
     bottom: 0;
     /*top: 30px;*/
 }

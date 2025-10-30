@@ -21,7 +21,7 @@ const TimeBarChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[],
 
     return (
         <div className='diagrams-container'>
-            <h3 className="diagrams-name">Среднее время на отрезках</h3>
+            <h3 className="diagrams-name">Средний темп на отрезках</h3>
             <BarChart
                 width={Math.max(window.innerWidth * 0.88, 1200)}
                 height={500}
