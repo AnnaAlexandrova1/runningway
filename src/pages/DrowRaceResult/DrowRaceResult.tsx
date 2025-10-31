@@ -2,7 +2,7 @@ import DynamicComponent from "../../components/Dynamic";
 import TimeBarChart from "../../components/TimeBarChart";
 import {Button, Form, Input, Select, Radio, Tooltip, Col, Row} from 'antd';
 import {useReducer, useState} from "react";
-import RaceResultService from "../../api/RaceResultService";
+import RaceResultService from "../../services/RaceResultService";
 import {IDistanceSelect, IObjecLiteral, IParticipant, IRaceResultState, IRaceRHR} from "../../interfaces/interfaces";
 import {initialRaseResultState, raceResultReducer} from "./state";
 import {genderList, rasesListRHR, years} from "../../configData/data";
@@ -10,11 +10,13 @@ import {DownloadOutlined, UnorderedListOutlined} from "@ant-design/icons";
 import Loader from "../../components/Loader";
 import Error from "../../components/Error";
 import dynamic from "../../components/Dynamic";
+import LocalStorageService from "../../services/LocalStorageService";
 
 const {Search} = Input;
 
 const DrowRaceResult = () => {
     const raceresultService = new RaceResultService();
+    const localStorageService = new LocalStorageService();
     const [state, dispatch] = useReducer(raceResultReducer, initialRaseResultState);
     const [splits, setSplit] = useState<{}>([]);
 
@@ -141,16 +143,32 @@ const DrowRaceResult = () => {
         const requests = state.selectPid.map((elem, index) => {
             return {
                 key: `${index}`,
+                storageKey: `${state.raceId}_splits`,
+                storageLongKey: `${state.key}/${elem}`,
                 fn: () => fetch(`https://my1.raceresult.com/${state.raceId}/RRPublish/data/splits?key=${state.key}&pid=${elem}`).then(r => r.json())
             }
         })
 
-
         try {
             setField('isLoading', true);
-            const finalResults: IObjecLiteral = await requests.reduce(async (previousPromise, {key, fn}) => {
+            let localSplits: any[] | null = localStorageService.getRaceDetails(`${state.raceId}_splits`) ?? [];
+
+            const finalResults: IObjecLiteral = await requests.reduce(async (previousPromise, {key, storageKey, storageLongKey,fn}) => {
                 const accumulatedResults = await previousPromise;
-                const result: { Splits: any[] } = await fn();
+                let result: { Splits: any[] } = {Splits: []};
+
+                if(localSplits.length > 0){
+                    let split = localSplits.find(el => el.key === storageLongKey);
+                    if(split){
+                        result = split.value;
+                    } else {
+                        result = await fn();
+                        localSplits.push({key:storageLongKey, value: result})
+                    }
+                } else {
+                    result = await fn();
+                    localSplits.push({key:storageLongKey, value: result})
+                }
 
                 setSplit(prev => ({...prev, [key]: result}));
 
@@ -159,7 +177,7 @@ const DrowRaceResult = () => {
                 return {...accumulatedResults, [key]: result.Splits};
             }, Promise.resolve({}))
 
-
+            localStorageService.serRaceDetails(`${state.raceId}_splits`, localSplits)
             let finalSplits = [];
             for (let k in finalResults) {
                 finalSplits.push(finalResults[k])
@@ -201,7 +219,7 @@ const DrowRaceResult = () => {
     }
 
     const getLength = (length: number) => {
-        return length > 8 ? 18 : 25
+      return length > 8 ? 18 : 25
     }
 
     const transformDynamics = (dynamics: []): IObjecLiteral[] => {
