@@ -9,7 +9,6 @@ import {genderList, rasesListRHR, years} from "../../configData/data";
 import {DownloadOutlined, UnorderedListOutlined} from "@ant-design/icons";
 import Loader from "../../components/Loader";
 import Error from "../../components/Error";
-import dynamic from "../../components/Dynamic";
 import LocalStorageService from "../../services/LocalStorageService";
 
 const {Search} = Input;
@@ -182,8 +181,10 @@ const DrowRaceResult = () => {
             for (let k in finalResults) {
                 finalSplits.push(finalResults[k])
             }
+            const trDynamics = transformDynamics(finalSplits as []);
             setField('finalSplits', finalSplits)
-            setField('transformDynamics', transformDynamics(finalSplits as []))
+            setField('transformDynamics', trDynamics)
+            setField('legend', getLegend(trDynamics))
         } catch (err) {
             console.error(err.code)
             setField('isLoading', false);
@@ -382,9 +383,9 @@ const DrowRaceResult = () => {
                 {state.finalSplits.length > 0 && <div>
                     {!state.isLoading && <div>
                       <DynamicComponent dynamics={state.transformDynamics} selectPid={state.selectPid}
-                                        legend={getLegend(state.transformDynamics)}></DynamicComponent>
+                                        legend={state.legend}></DynamicComponent>
                       <TimeBarChart dynamics={state.transformDynamics} selectedPid={state.selectPid}
-                                    legend={getLegend(state.transformDynamics)}></TimeBarChart>
+                                    legend={state.legend}></TimeBarChart>
                     </div>}
                 </div>}
             </div>}

@@ -40,6 +40,7 @@ export interface IRaceResultState {
     participants: IParticipant[];
     finalSplits: IObjecLiteral[];
     transformDynamics: IObjecLiteral[];
+    legend: IObjecLiteral;
 };
 
 export type RaceResultAction =
