@@ -152,21 +152,26 @@ const DrowRaceResult = () => {
             setField('isLoading', true);
             let localSplits: any[] | null = localStorageService.getRaceDetails(`${state.raceId}_splits`) ?? [];
 
-            const finalResults: IObjecLiteral = await requests.reduce(async (previousPromise, {key, storageKey, storageLongKey,fn}) => {
+            const finalResults: IObjecLiteral = await requests.reduce(async (previousPromise, {
+                key,
+                storageKey,
+                storageLongKey,
+                fn
+            }) => {
                 const accumulatedResults = await previousPromise;
                 let result: { Splits: any[] } = {Splits: []};
 
-                if(localSplits.length > 0){
+                if (localSplits.length > 0) {
                     let split = localSplits.find(el => el.key === storageLongKey);
-                    if(split){
+                    if (split) {
                         result = split.value;
                     } else {
                         result = await fn();
-                        localSplits.push({key:storageLongKey, value: result})
+                        localSplits.push({key: storageLongKey, value: result})
                     }
                 } else {
                     result = await fn();
-                    localSplits.push({key:storageLongKey, value: result})
+                    localSplits.push({key: storageLongKey, value: result})
                 }
 
                 setSplit(prev => ({...prev, [key]: result}));
@@ -220,7 +225,7 @@ const DrowRaceResult = () => {
     }
 
     const getLength = (length: number) => {
-      return length > 8 ? 18 : 25
+        return length > 8 ? 18 : 25
     }
 
     const transformDynamics = (dynamics: []): IObjecLiteral[] => {
@@ -265,10 +270,18 @@ const DrowRaceResult = () => {
 
     const getLegend = (data: any[]): IObjecLiteral => {
         let legend: IObjecLiteral = {}
-
-        data.forEach((d, i) => {
-            legend[`fio${i}`] = d[`fio${i}`]
-        })
+        if (data[0]) {
+            let exist = true;
+            let i = 0;
+            while (exist && i < 11) {
+                if (data[0].hasOwnProperty([`fio${i}`])) {
+                    legend[`fio${i}`] = data[0][`fio${i}`];
+                    i++
+                } else {
+                    exist = false
+                }
+            }
+        }
 
         return legend
     }
@@ -295,15 +308,16 @@ const DrowRaceResult = () => {
 
                   <div className="racesList-container">
                       {years.map(year => {
-                        return  <div key={year} className="racesList-container-year">
+                          return <div key={year} className="racesList-container-year">
                               <h4>{year}</h4>
 
-                            {rasesListRHR.filter(item => item.year === year).map((item: IRaceRHR, index) => {
-                                return <Button key={index + item.nameRace} onClick={() => handleButtonRaceSearch(item.id)}>
-                                    {item.nameRace}
-                                </Button>
-                            })
-                            }
+                              {rasesListRHR.filter(item => item.year === year).map((item: IRaceRHR, index) => {
+                                  return <Button key={index + item.nameRace}
+                                                 onClick={() => handleButtonRaceSearch(item.id)}>
+                                      {item.nameRace}
+                                  </Button>
+                              })
+                              }
                           </div>
                       })}
 
