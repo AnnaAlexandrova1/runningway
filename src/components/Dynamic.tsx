@@ -15,8 +15,6 @@ const DynamicComponent = (props: { dynamics: [], selectPid: string[], legend: IO
         return data.slice(1)
     }
 
-    console.log(dynamics)
-
     return (
         <div className='diagrams-container'>
             <h3 className="diagrams-name">Динамика позиций</h3>

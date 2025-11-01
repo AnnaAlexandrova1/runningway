@@ -152,6 +152,15 @@ header {
     margin-top: 40px;
 }
 
+.diagrams-info {
+    display: block;
+    text-align: center;
+    font-size: 17px;
+    font-family: "Lora", serif;
+    font-style: italic;
+    font-weight: 400;
+}
+
 .diagrams-name {
     text-align: center;
     font-size: 20px;

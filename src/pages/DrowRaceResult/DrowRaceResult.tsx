@@ -10,6 +10,7 @@ import {DownloadOutlined, UnorderedListOutlined} from "@ant-design/icons";
 import Loader from "../../components/Loader";
 import Error from "../../components/Error";
 import LocalStorageService from "../../services/LocalStorageService";
+import GapFromFirstChart from "../../components/GapFromFirstChart";
 
 const {Search} = Input;
 
@@ -229,36 +230,48 @@ const DrowRaceResult = () => {
     }
 
     const transformDynamics = (dynamics: []): IObjecLiteral[] => {
-        // @ts-ignore
-        const runners: IObjecLiteral[] = dynamics.reduce((prev: IObjecLiteral[], curr: IObjecLiteral[], index) => {
-            if (index === 0) {
-                prev = prev.concat(curr.map((currentElem, curIndex: number) => {
-                    return {
-                        Name: currentElem.Name,
-                        NameForChart: (currentElem.Name).slice(0, curIndex === 1 ? 5 : getLength(curr.length)),
-                        "Exists0": currentElem.Exists,
-                        "Gun0": currentElem.Gun,
-                        "position0": state.selectGender === 'all' ? currentElem.RO : currentElem.RG,
-                        "speed0": currentElem.Speed ? transformTime(currentElem.Speed) : 0,
-                        "speedString0": currentElem.Speed ? currentElem.Speed : "",
-                        "fio0": state.participants.find(elem => elem.pId === state.selectPid[0]).name,
-                    }
-                }))
-            } else {
-                prev.forEach((el, elIndex) => {
-                    let currElem = curr.find((item: IObjecLiteral) => item.Name === el.Name);
-                    prev[elIndex][`Exists${index}`] = currElem.Exists;
-                    prev[elIndex][`Gun${index}`] = currElem.Gun;
-                    prev[elIndex][`position${index}`] = state.selectGender === 'all' ? currElem.RO : currElem.RG;
-                    prev[elIndex][`speed${index}`] = currElem.Speed ? transformTime(currElem.Speed) : 0;
-                    prev[elIndex][`speedString${index}`] = currElem.Speed ? currElem.Speed : "";
-                    prev[elIndex][`fio${index}`] = state.participants.find(elem => elem.pId === state.selectPid[index]).name
-                })
-            }
-            return prev
+        const transformTimeSeconds = (time) => {
+            const [h1, m1, s1] = time.split(':').map(Number);
+            return  h1 * 3600 + m1 * 60 + s1;
+        }
+            const runners: IObjecLiteral[] = dynamics.reduce((prev: IObjecLiteral[], curr: IObjecLiteral[], index) => {
+                if (index === 0) {
+                    prev = prev.concat(curr.map((currentElem, curIndex: number) => {
+                        return {
+                            Name: currentElem.Name,
+                            NameForChart: (currentElem.Name).slice(0, curIndex === 1 ? 5 : getLength(curr.length)),
+                            "Exists0": currentElem.Exists,
+                            "Gun0": currentElem.Gun,
+                            "GunSeconds0": transformTimeSeconds(currentElem.Gun),
+                            "position0": state.selectGender === 'all' ? currentElem.RO : currentElem.RG,
+                            "speed0": currentElem.Speed ? transformTime(currentElem.Speed) : 0,
+                            "speedString0": currentElem.Speed ? currentElem.Speed : "",
+                            "fio0": state.participants.find(elem => elem.pId === state.selectPid[0]).name,
+                            "chip0": currentElem.Chip ?? '00:00:00',
+                            "chipSeconds0": currentElem.Chip ? transformTimeSeconds(currentElem.Chip) : 0,
+                            "sector0": currentElem.Sector ?? '00:00:00',
+                        }
+                    }))
+                } else {
+                    prev.forEach((el, elIndex) => {
+                        let currElem = curr.find((item: IObjecLiteral) => item.Name === el.Name);
+                        prev[elIndex][`Exists${index}`] = currElem.Exists;
+                        prev[elIndex][`Gun${index}`] = currElem.Gun;
+                        prev[elIndex][`GunSeconds${index}`] = currElem.Gun ? transformTimeSeconds(currElem.Gun) : 0;
+                        prev[elIndex][`position${index}`] = state.selectGender === 'all' ? currElem.RO : currElem.RG;
+                        prev[elIndex][`speed${index}`] = currElem.Speed ? transformTime(currElem.Speed) : 0;
+                        prev[elIndex][`speedString${index}`] = currElem.Speed ? currElem.Speed : "";
+                        prev[elIndex][`fio${index}`] = state.participants.find(elem => elem.pId === state.selectPid[index]).name;
+                        prev[elIndex][`chip${index}`] = currElem.Chip ? currElem.Chip : '00:00:00';
+                        prev[elIndex][`sector${index}`] = currElem.Sector ? currElem.Sector : '00:00:00';
+                        prev[elIndex][`chipSeconds${index}`] = currElem.Chip ? transformTimeSeconds(currElem.Chip) : 0;
+                    })
+                }
+                return prev
 
-        }, [])
-        return runners
+            }, [])
+            return runners
+
     }
 
     const transformTime = (time: string): number => {
@@ -400,6 +413,8 @@ const DrowRaceResult = () => {
                                         legend={state.legend}></DynamicComponent>
                       <TimeBarChart dynamics={state.transformDynamics} selectedPid={state.selectPid}
                                     legend={state.legend}></TimeBarChart>
+                      <GapFromFirstChart dynamics={state.transformDynamics} selectedPid={state.selectPid}
+                                    legend={state.legend}></GapFromFirstChart>
                     </div>}
                 </div>}
             </div>}

@@ -13,11 +13,22 @@ import {IObjecLiteral} from "../interfaces/interfaces";
 import {chartColors} from "../configData/stylesData";
 
 const TimeBarChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[], legend: IObjecLiteral }) => {
-    const {dynamics, selectedPid, legend} = props
+    const {dynamics, selectedPid, legend} = props;
+
+    const tickFormatter =  (value: number) => {
+        let newVal = `${Math.floor(value / 60)}:${('0' + (value % 60)).slice(-2)} мин/км`
+
+        return newVal;
+    }
+
+    const formatter = (value: number, name) => {
+        return [tickFormatter(value), name];
+    }
 
     const dynamicsWithoutFirst = (data: any[]) => {
         return data.slice(1)
     }
+    console.log(dynamicsWithoutFirst(dynamics))
 
     return (
         <div className='diagrams-container'>
@@ -27,21 +38,15 @@ const TimeBarChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[],
                 height={500}
                 data={dynamicsWithoutFirst(dynamics)}
                 margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5,
+                    top: 20,
+                    left: 60      // Увеличиваем для левой оси
                 }}
                 className="diagram"
             >
                 <CartesianGrid strokeDasharray="3 3"/>
                 <XAxis dataKey="Name"/>
-                <YAxis hide={true}/>
-                <Tooltip formatter={(value: number, name) => {
-                    let newVal = `${Math.floor(value / 60)}:${('0' + (value % 60)).slice(-2)} мин/км`
-
-                    return [newVal, name];
-                }}/>
+                <YAxis tickFormatter={tickFormatter}/>
+                <Tooltip formatter={formatter}/>
                 <Legend/>
 
                 {selectedPid.map((item, i) => {
