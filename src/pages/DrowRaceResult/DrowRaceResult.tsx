@@ -12,6 +12,7 @@ import Error from "../../components/Error";
 import LocalStorageService from "../../services/LocalStorageService";
 import GapFromFirstChart from "../../components/GapFromFirstChart";
 import SectionRatioChart from "../../components/SectionRatioChart";
+import SectorChart from "../../components/SectorChart";
 
 const {Search} = Input;
 
@@ -250,7 +251,7 @@ const DrowRaceResult = () => {
                             "fio0": state.participants.find(elem => elem.pId === state.selectPid[0]).name,
                             "chip0": currentElem.Chip ?? '00:00:00',
                             "chipSeconds0": currentElem.Chip ? transformTimeSeconds(currentElem.Chip) : 0,
-                            "sector0": currentElem.Sector ?? '00:00:00',
+                            "sector0": currentElem.Sector ? transformTimeSeconds(currentElem.Sector) : 0,
                         }
                     }))
                 } else {
@@ -264,7 +265,7 @@ const DrowRaceResult = () => {
                         prev[elIndex][`speedString${index}`] = currElem.Speed ? currElem.Speed : "";
                         prev[elIndex][`fio${index}`] = state.participants.find(elem => elem.pId === state.selectPid[index]).name;
                         prev[elIndex][`chip${index}`] = currElem.Chip ? currElem.Chip : '00:00:00';
-                        prev[elIndex][`sector${index}`] = currElem.Sector ? currElem.Sector : '00:00:00';
+                        prev[elIndex][`sector${index}`] = currElem.Sector ? transformTimeSeconds(currElem.Sector) : 0;
                         prev[elIndex][`chipSeconds${index}`] = currElem.Chip ? transformTimeSeconds(currElem.Chip) : 0;
                     })
                 }

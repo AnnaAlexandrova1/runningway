@@ -156,6 +156,7 @@ header {
     display: block;
     text-align: center;
     font-size: 17px;
+    color: rgba(40, 44, 52, 0.82);
     font-family: "Lora", serif;
     font-style: italic;
     font-weight: 400;

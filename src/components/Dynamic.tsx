@@ -18,6 +18,8 @@ const DynamicComponent = (props: { dynamics: [], selectPid: string[], legend: IO
     return (
         <div className='diagrams-container'>
             <h3 className="diagrams-name">Динамика позиций</h3>
+            <span
+                className="diagrams-info">("-1" - не считался чип)</span>
             <LineChart
                 width={Math.max(window.innerWidth * 0.88, 1200)}
                 height={600}
