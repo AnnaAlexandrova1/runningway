@@ -1,0 +1,45 @@
+version: '3'
+
+vars:
+  BIN_DIR: bin
+  APP_NAME: api
+  VERSION: 1.0.0
+
+tasks:
+  default:
+    desc: Сборка для Linux и macOS
+    cmds:
+      - task: build:all
+
+  build:all:
+    desc: Сборка для всех платформ
+    deps: [build:linux, build:darwin]
+    cmds:
+      - echo "Сборка завершена!"
+      - ls -la {{.BIN_DIR}}/
+
+  build:linux:
+    desc: Сборка для Linux
+    cmds:
+      - mkdir -p {{.BIN_DIR}}
+      - GOOS=linux GOARCH=amd64 go build -o {{.BIN_DIR}}/{{.APP_NAME}}-linux-amd64 ./cmd/{{.APP_NAME}}
+      - echo "🐧 Linux сборка готова"
+
+  build:darwin:
+    desc: Сборка для macOS
+    cmds:
+      - mkdir -p {{.BIN_DIR}}
+      - GOOS=darwin GOARCH=amd64 go build -o {{.BIN_DIR}}/{{.APP_NAME}}-darwin-amd64 ./cmd/{{.APP_NAME}}
+      - echo "🍎 macOS сборка готова"
+
+  clean:
+    desc: Очистка бинарников
+    cmds:
+      - rm -rf {{.BIN_DIR}}
+      - echo "🗑️ Папка {{.BIN_DIR}} очищена"
+
+  move:
+    desc: Перемещение файлов фронта в web
+    cmds:
+      - mkdir ./web/build
+      - cp -rf ../build/* ./web/build/
