@@ -1,13 +1,38 @@
-import logo from './logo.svg';
+import React from 'react';
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import './App.css';
-import DrowYouRace from "./pages/DrowYouRace";
+import Layout from "./components/Layout";
+import {RoutesList} from "./configData/Routes";
+
 
 function App() {
-  return (
-    <div className="App">
-        <DrowYouRace></DrowYouRace>
-    </div>
-  );
+    const routeComponents = RoutesList.map(
+        ({path, component, protected_route}, key) => {
+            return (
+                <Route
+                    key={key}
+                    path={path}
+                    element={
+                        protected_route ? (
+                            <Route>{component}</Route>
+                        ) : (
+                            component
+                        )
+                    }
+                />
+            );
+        }
+    );
+
+    return (
+        <Router>
+            <Layout>
+                <Routes>
+                    {routeComponents}
+                </Routes>
+            </Layout>
+        </Router>
+    );
 }
 
 export default App;
