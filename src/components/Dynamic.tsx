@@ -21,6 +21,10 @@ const DynamicComponent = (props: { dynamics: [], selectPid: string[], legend: IO
             <LineChart
                 width={Math.max(window.innerWidth * 0.88, 1200)}
                 height={600}
+                margin={{
+                    top: 20,
+                    left: 60
+                }}
                 data={dynamicsWithoutFirst(dynamics)}
                 className="diagram"
 

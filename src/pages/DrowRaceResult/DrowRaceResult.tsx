@@ -5,12 +5,13 @@ import {useReducer, useState} from "react";
 import RaceResultService from "../../services/RaceResultService";
 import {IDistanceSelect, IObjecLiteral, IParticipant, IRaceResultState, IRaceRHR} from "../../interfaces/interfaces";
 import {initialRaseResultState, raceResultReducer} from "./state";
-import {genderList, rasesListRHR, years} from "../../configData/data";
+import {genderList, maxAthlets, rasesListRHR, years} from "../../configData/data";
 import {DownloadOutlined, UnorderedListOutlined} from "@ant-design/icons";
 import Loader from "../../components/Loader";
 import Error from "../../components/Error";
 import LocalStorageService from "../../services/LocalStorageService";
 import GapFromFirstChart from "../../components/GapFromFirstChart";
+import SectionRatioChart from "../../components/SectionRatioChart";
 
 const {Search} = Input;
 
@@ -20,7 +21,7 @@ const DrowRaceResult = () => {
     const [state, dispatch] = useReducer(raceResultReducer, initialRaseResultState);
     const [splits, setSplit] = useState<{}>([]);
 
-
+    console.log(state)
     const setField = (field: keyof IRaceResultState, value: any) => {
         dispatch({type: 'SET_FIELD', payload: {field, value}});
     };
@@ -286,7 +287,7 @@ const DrowRaceResult = () => {
         if (data[0]) {
             let exist = true;
             let i = 0;
-            while (exist && i < 11) {
+            while (exist && i < maxAthlets) {
                 if (data[0].hasOwnProperty([`fio${i}`])) {
                     legend[`fio${i}`] = data[0][`fio${i}`];
                     i++
@@ -415,6 +416,8 @@ const DrowRaceResult = () => {
                                     legend={state.legend}></TimeBarChart>
                       <GapFromFirstChart dynamics={state.transformDynamics} selectedPid={state.selectPid}
                                     legend={state.legend}></GapFromFirstChart>
+                      <SectionRatioChart dynamics={state.transformDynamics} selectedPid={state.selectPid}
+                                         legend={state.legend}></SectionRatioChart>
                     </div>}
                 </div>}
             </div>}

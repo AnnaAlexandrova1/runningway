@@ -28,7 +28,6 @@ const TimeBarChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[],
     const dynamicsWithoutFirst = (data: any[]) => {
         return data.slice(1)
     }
-    console.log(dynamicsWithoutFirst(dynamics))
 
     return (
         <div className='diagrams-container'>
