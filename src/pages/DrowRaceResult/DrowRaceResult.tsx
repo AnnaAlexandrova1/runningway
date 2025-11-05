@@ -234,45 +234,45 @@ const DrowRaceResult = () => {
     const transformDynamics = (dynamics: []): IObjecLiteral[] => {
         const transformTimeSeconds = (time) => {
             const [h1, m1, s1] = time.split(':').map(Number);
-            return  h1 * 3600 + m1 * 60 + s1;
+            return h1 * 3600 + m1 * 60 + s1;
         }
-            const runners: IObjecLiteral[] = dynamics.reduce((prev: IObjecLiteral[], curr: IObjecLiteral[], index) => {
-                if (index === 0) {
-                    prev = prev.concat(curr.map((currentElem, curIndex: number) => {
-                        return {
-                            Name: currentElem.Name,
-                            NameForChart: (currentElem.Name).slice(0, curIndex === 1 ? 5 : getLength(curr.length)),
-                            "Exists0": currentElem.Exists,
-                            "Gun0": currentElem.Gun,
-                            "GunSeconds0": transformTimeSeconds(currentElem.Gun),
-                            "position0": state.selectGender === 'all' ? currentElem.RO : currentElem.RG,
-                            "speed0": currentElem.Speed ? transformTime(currentElem.Speed) : 0,
-                            "speedString0": currentElem.Speed ? currentElem.Speed : "",
-                            "fio0": state.participants.find(elem => elem.pId === state.selectPid[0]).name,
-                            "chip0": currentElem.Chip ?? '00:00:00',
-                            "chipSeconds0": currentElem.Chip ? transformTimeSeconds(currentElem.Chip) : 0,
-                            "sector0": currentElem.Sector ? transformTimeSeconds(currentElem.Sector) : 0,
-                        }
-                    }))
-                } else {
-                    prev.forEach((el, elIndex) => {
-                        let currElem = curr.find((item: IObjecLiteral) => item.Name === el.Name);
-                        prev[elIndex][`Exists${index}`] = currElem.Exists;
-                        prev[elIndex][`Gun${index}`] = currElem.Gun;
-                        prev[elIndex][`GunSeconds${index}`] = currElem.Gun ? transformTimeSeconds(currElem.Gun) : 0;
-                        prev[elIndex][`position${index}`] = state.selectGender === 'all' ? currElem.RO : currElem.RG;
-                        prev[elIndex][`speed${index}`] = currElem.Speed ? transformTime(currElem.Speed) : 0;
-                        prev[elIndex][`speedString${index}`] = currElem.Speed ? currElem.Speed : "";
-                        prev[elIndex][`fio${index}`] = state.participants.find(elem => elem.pId === state.selectPid[index]).name;
-                        prev[elIndex][`chip${index}`] = currElem.Chip ? currElem.Chip : '00:00:00';
-                        prev[elIndex][`sector${index}`] = currElem.Sector ? transformTimeSeconds(currElem.Sector) : 0;
-                        prev[elIndex][`chipSeconds${index}`] = currElem.Chip ? transformTimeSeconds(currElem.Chip) : 0;
-                    })
-                }
-                return prev
+        const runners: IObjecLiteral[] = dynamics.reduce((prev: IObjecLiteral[], curr: IObjecLiteral[], index) => {
+            if (index === 0) {
+                prev = prev.concat(curr.map((currentElem, curIndex: number) => {
+                    return {
+                        Name: currentElem.Name,
+                        NameForChart: (currentElem.Name).slice(0, curIndex === 1 ? 5 : getLength(curr.length)),
+                        "Exists0": currentElem.Exists,
+                        "Gun0": currentElem.Gun,
+                        "GunSeconds0": transformTimeSeconds(currentElem.Gun),
+                        "position0": state.selectGender === 'all' ? currentElem.RO : currentElem.RG,
+                        "speed0": currentElem.Speed ? transformTime(currentElem.Speed) : 0,
+                        "speedString0": currentElem.Speed ? currentElem.Speed : "",
+                        "fio0": state.participants.find(elem => elem.pId === state.selectPid[0]).name,
+                        "chip0": currentElem.Chip ?? '00:00:00',
+                        "chipSeconds0": currentElem.Chip ? transformTimeSeconds(currentElem.Chip) : 0,
+                        "sector0": currentElem.Sector ? transformTimeSeconds(currentElem.Sector) : 0,
+                    }
+                }))
+            } else {
+                prev.forEach((el, elIndex) => {
+                    let currElem = curr.find((item: IObjecLiteral) => item.Name === el.Name);
+                    prev[elIndex][`Exists${index}`] = currElem.Exists;
+                    prev[elIndex][`Gun${index}`] = currElem.Gun;
+                    prev[elIndex][`GunSeconds${index}`] = currElem.Gun ? transformTimeSeconds(currElem.Gun) : 0;
+                    prev[elIndex][`position${index}`] = state.selectGender === 'all' ? currElem.RO : currElem.RG;
+                    prev[elIndex][`speed${index}`] = currElem.Speed ? transformTime(currElem.Speed) : 0;
+                    prev[elIndex][`speedString${index}`] = currElem.Speed ? currElem.Speed : "";
+                    prev[elIndex][`fio${index}`] = state.participants.find(elem => elem.pId === state.selectPid[index]).name;
+                    prev[elIndex][`chip${index}`] = currElem.Chip ? currElem.Chip : '00:00:00';
+                    prev[elIndex][`sector${index}`] = currElem.Sector ? transformTimeSeconds(currElem.Sector) : 0;
+                    prev[elIndex][`chipSeconds${index}`] = currElem.Chip ? transformTimeSeconds(currElem.Chip) : 0;
+                })
+            }
+            return prev
 
-            }, [])
-            return runners
+        }, [])
+        return runners
 
     }
 
@@ -305,55 +305,58 @@ const DrowRaceResult = () => {
         return option.children.toLowerCase().includes(input.toLowerCase())
     };
     return (
-        <div className="content-container">
+        <div className="w-full">
             {!state.isError && <div>
-                {state.eventName === "" && !state.isLoading && <div className="start-container">
-                  <h3 className="race-header">Ссылка на страницу гонки от RHR на <b>my.raceresult.com</b> или id гонки
-                  </h3>
-                  <div className="search-input">
-                    <Search placeholder="https://my.raceresult.com/308416/ или 359948"
-                            enterButton="Поиск"
-                            size="large"
-                            onChange={handleInputChange}
-                            onSearch={() => handleSearch()}
-                            value={state.raceId}/>
-                  </div>
+                {state.eventName === "" && !state.isLoading &&
+                  <div className="sm:w-full md:f-full lg:w-[850px] ml-auto mr-auto">
+                    <h3 className="race-header">Ссылка на страницу гонки от RHR на <b>my.raceresult.com</b> или id гонки
+                    </h3>
+                    <div className="search-input">
+                      <Search placeholder="https://my.raceresult.com/308416/ или 359948"
+                              enterButton="Поиск"
+                              size="large"
+                              onChange={handleInputChange}
+                              onSearch={() => handleSearch()}
+                              value={state.raceId}/>
+                    </div>
 
-                  <h3 className="race-header">Смотреть недавние гонки</h3>
+                    <h3 className="race-header">Смотреть недавние гонки</h3>
 
-                  <div className="racesList-container">
-                      {years.map(year => {
-                          return <div key={year} className="racesList-container-year">
-                              <h4>{year}</h4>
+                    <div className="flex flex-col md:flex-row lg:flex-row gap-4 mt-[20px] ml-auto mr-auto">
+                        {years.map(year => {
+                            return <div key={year}
+                                        className="racesList-container-year pl-[15px] pr-[15px] md:pl-15 md:pr-15 lg:pr-0 lg:pl-0">
+                                <h4>{year}</h4>
 
-                              {rasesListRHR.filter(item => item.year === year).map((item: IRaceRHR, index) => {
-                                  return <Button key={index + item.nameRace}
-                                                 onClick={() => handleButtonRaceSearch(item.id)}>
-                                      {item.nameRace}
-                                  </Button>
-                              })
-                              }
-                          </div>
-                      })}
+                                {rasesListRHR.filter(item => item.year === year).map((item: IRaceRHR, index) => {
+                                    return <Button key={index + item.nameRace}
+                                                   onClick={() => handleButtonRaceSearch(item.id)}>
+                                        {item.nameRace}
+                                    </Button>
+                                })
+                                }
+                            </div>
+                        })}
 
 
-                  </div>
-                </div>}
+                    </div>
+                  </div>}
 
                 {state.eventName.length > 0 && <div>
-                  <div style={{position: "relative"}}>
+                  <div className="flex flex-col-reverse p-8 md:flex md:flex-col-reverse lg:relative">
                     <h1 className="race-header">{state.eventName}</h1>
                       {state.eventName.length > 0 &&
-                        <Button type="primary" icon={<UnorderedListOutlined/>} size={25} className="race-back-button"
+                        <Button type="primary" icon={<UnorderedListOutlined/>} size={25}
+                                className="lg:absolute lg:bottom-0 lg:top-[30px] lg:right-[15%]"
                                 color="default" variant="outlined" onClick={handleBackRasesList}>
                           Другие гонки
                         </Button>
                       }
                   </div>
 
-                  <Form layout="horizontal" className="race-form">
+                  <Form layout="horizontal" className="mt-[20px]">
                       {state.distance.length > 0 &&
-                        <Form.Item className="distance-container">
+                        <Form.Item className="w-full p-6 md:w-[450px] lg:w-[500px] lg:p-0 ml-auto mr-auto">
                           <Select onChange={handleDistanceChange} placeholder="Выбрать дистанцию">
                               {state.distance.map((item: IDistanceSelect) => {
                                       return <Select.Option value={item.value}
@@ -378,7 +381,7 @@ const DrowRaceResult = () => {
                           maxCount={10}
                           optionFilterProp="children"
                           filterOption={filterOption}
-                          style={{width: '1200px'}}
+                          className="w-full p-6 md:w-[500px] lg:w-[1200px] lg:p-0 ml-auto mr-auto"
                           placeholder="Выберите атлетов (не более 10)"
                           value={state.selectPid}
                           onChange={handleParticipantsChange}
@@ -416,7 +419,7 @@ const DrowRaceResult = () => {
                       <TimeBarChart dynamics={state.transformDynamics} selectedPid={state.selectPid}
                                     legend={state.legend}></TimeBarChart>
                       <GapFromFirstChart dynamics={state.transformDynamics} selectedPid={state.selectPid}
-                                    legend={state.legend}></GapFromFirstChart>
+                                         legend={state.legend}></GapFromFirstChart>
                       <SectionRatioChart dynamics={state.transformDynamics} selectedPid={state.selectPid}
                                          legend={state.legend}></SectionRatioChart>
                     </div>}
