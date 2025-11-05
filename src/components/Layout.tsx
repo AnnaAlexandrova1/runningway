@@ -10,7 +10,7 @@ const Layout: React.FC<{ children?: React.ReactNode }>  = ({ children }: LayoutP
     return (
         <div className="layout">
             <Header/>
-            <main className="main-container">
+            <main className="sm:w-full md: w-full lg:w-[90%] ml-auto mr-auto main-container">
                 {children}
             </main>
             <Footer/>

@@ -22,3 +22,6 @@ export const footerPoints: string[] = [
 ]
 
 export const years:string[] = ['2024', '2025']
+
+// максимальное число атлетов
+export const maxAthlets = 10;

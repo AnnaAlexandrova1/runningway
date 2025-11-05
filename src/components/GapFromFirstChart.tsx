@@ -3,6 +3,7 @@ import React from "react";
 import {CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis} from "recharts";
 import {chartColors} from "../configData/stylesData";
 import dynamic from "./Dynamic";
+import {maxAthlets} from "../configData/data";
 
 const GapFromFirstChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[], legend: IObjecLiteral }) => {
     const {dynamics, selectedPid, legend} = props;
@@ -35,15 +36,14 @@ const GapFromFirstChart = (props: { dynamics: IObjecLiteral[], selectedPid: stri
         let gapsFinish: string[] = Object.keys(dynamics[dynamics.length - 1]).filter(el => el.includes('chipSeconds'));
         let finish= dynamics[dynamics.length - 1]
         let fastest:number = gapsFinish.reduce((fast,el) => {
-
             return finish[el] < fast ? finish[el] : fast }, finish['chipSeconds0']
         );
         let fastestOwner = extractNumber(getKeyByValue(finish, fastest));
 
-       const newDynamincs = dynamics.map((item, index) => {
+       let newDynamincs = dynamics.map((item, index) => {
            let i = 0;
            let isLast = true;
-           while(isLast && i < 11){
+           while(isLast && i <= maxAthlets){
                if(item.hasOwnProperty(`chip${i}`)){
                    item[`gap${i}`] = i === Number(fastestOwner) ? 0 : Math.round(item[`chipSeconds${i}`] - item[`chipSeconds${fastestOwner}`])
                    i++
@@ -58,7 +58,7 @@ const GapFromFirstChart = (props: { dynamics: IObjecLiteral[], selectedPid: stri
         return newDynamincs;
     }
 
-    const gapInfo = gap(dynamics);
+    let gapInfo = gap(dynamics);
 
 
     return (<div className='diagrams-container'>
