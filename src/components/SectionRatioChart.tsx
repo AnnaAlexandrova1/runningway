@@ -17,6 +17,10 @@ const SectionRatioChart = (props: { dynamics: IObjecLiteral[], selectedPid: stri
         return data.slice(1)
     }
 
+    const tickXFormatter = (value: string): string => {
+        return dataTransformService.tickTransform(value)
+    }
+
     let calcRathio = () => {
         const dynamicsWF = dynamicsWithoutFirst(dynamics);
         let gapsFinish: string[] = Object.keys(dynamics[dynamics.length - 1]).filter(el => el.includes('chipSeconds'));
@@ -48,7 +52,7 @@ const SectionRatioChart = (props: { dynamics: IObjecLiteral[], selectedPid: stri
                     className="diagram"
                 >
                     <CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="Name"/>
+                    <XAxis dataKey="Name"  tickFormatter={tickXFormatter}/>
                     <YAxis tickFormatter={tickFormatter}/>
                     <Tooltip formatter={tickFormatter}/>
                     <Legend/>

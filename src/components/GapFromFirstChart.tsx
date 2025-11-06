@@ -25,9 +25,8 @@ const GapFromFirstChart = (props: { dynamics: IObjecLiteral[], selectedPid: stri
         return newVal;
     }
 
-    const calcWidth = (): number => {
-        let width = window.innerWidth;
-        return dataTransformService.calcWidth(width)
+    const tickXFormatter = (value: string): string => {
+        return dataTransformService.tickTransform(value)
     }
 
     function getKeyByValue(object: {}, value: number) {
@@ -84,7 +83,7 @@ const GapFromFirstChart = (props: { dynamics: IObjecLiteral[], selectedPid: stri
                     className="diagram"
                 >
                     <CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="NameForChart" domain={[15, 20]} allowDataOverflow/>
+                    <XAxis dataKey="Name"  tickFormatter={tickXFormatter}/>
                     <YAxis minTickGap={2} tickFormatter={tickFormatter}/>
                     <Tooltip formatter={formatter}/>
                     <Legend/>

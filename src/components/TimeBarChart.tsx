@@ -26,6 +26,10 @@ const TimeBarChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[],
         return newVal;
     }
 
+    const tickXFormatter = (value: string): string => {
+        return dataTransformService.tickTransform(value)
+    }
+
     const serviceFormatter = (value: number, key?: IObjecLiteral) => {
         if (key && key.dataKey) {
             let number = parseInt(key.dataKey.split("speed")[1])
@@ -55,7 +59,7 @@ const TimeBarChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[],
                         className="diagram"
                     >
                         <CartesianGrid strokeDasharray="3 3"/>
-                        <XAxis dataKey="Name"/>
+                        <XAxis dataKey="Name" tickFormatter={tickXFormatter}/>
                         <YAxis tickFormatter={tickFormatter}/>
                         <Tooltip formatter={formatter}/>
                         <Legend/>

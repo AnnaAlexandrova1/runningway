@@ -18,6 +18,10 @@ const DynamicComponent = (props: { dynamics: [], selectPid: string[], legend: IO
         return data.slice(1)
     }
 
+    const tickXFormatter = (value: string): string => {
+        return dataTransformService.tickTransform(value)
+    }
+
 
     return (
         <div className='diagrams-container'>
@@ -36,7 +40,7 @@ const DynamicComponent = (props: { dynamics: [], selectPid: string[], legend: IO
 
                 >
                     <CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="Name" allowDataOverflow/>
+                    <XAxis dataKey="Name"  tickFormatter={tickXFormatter}/>
                     <YAxis minTickGap={2}/>
                     <Tooltip/>
                     <Legend/>
