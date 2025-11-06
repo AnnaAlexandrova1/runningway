@@ -18,10 +18,10 @@ export const rasesListRHR: IRaceRHR[] = [
 
 export const footerPoints: string[] = [
     'О нас',
-    'Пожелания и предложения',
+    // 'Контакты',
 ]
 
-export const years:string[] = ['2024', '2025']
+export const years:string[] = ['2025', '2024']
 
 // максимальное число атлетов
 export const maxAthlets = 10;

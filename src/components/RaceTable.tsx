@@ -36,7 +36,7 @@ const RaceTable = (props: { participants: IParticipant[] }) => {
             key: 'gunTime',
         },
         {
-            title: 'Средняя скорость',
+            title: 'Средний темп',
             dataIndex: 'pace',
             key: 'pace',
         },

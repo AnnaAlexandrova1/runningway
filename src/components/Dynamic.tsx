@@ -1,4 +1,5 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+
 
 // @ts-ignore
 import React from 'react';
@@ -39,7 +40,7 @@ const DynamicComponent = (props: { dynamics: [], selectPid: string[], legend: IO
 
             >
                 <CartesianGrid strokeDasharray="3 3"/>
-                <XAxis dataKey="NameForChart" domain={[15, 20]} allowDataOverflow/>
+                <XAxis dataKey="Name" allowDataOverflow/>
                 <YAxis minTickGap={2}/>
                 <Tooltip/>
                 <Legend/>
