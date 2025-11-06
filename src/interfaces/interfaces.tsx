@@ -13,7 +13,11 @@ export interface IParticipant {
     chipTime: string;
     dropDownName: string;
     dropDownGenderName: string;
-    gender: string
+    gender: string;
+    ageGroup: string;
+    nameForTable: string;
+    pace: string;
+    gunTime: string
 }
 
 export interface IObjecLiteral {

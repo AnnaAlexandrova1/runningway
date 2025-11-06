@@ -12,7 +12,7 @@ import Error from "../../components/Error";
 import LocalStorageService from "../../services/LocalStorageService";
 import GapFromFirstChart from "../../components/GapFromFirstChart";
 import SectionRatioChart from "../../components/SectionRatioChart";
-import SectorChart from "../../components/SectorChart";
+import RaceTable from "../../components/RaceTable";
 
 const {Search} = Input;
 
@@ -22,7 +22,6 @@ const DrowRaceResult = () => {
     const [state, dispatch] = useReducer(raceResultReducer, initialRaseResultState);
     const [splits, setSplit] = useState<{}>([]);
 
-    console.log(state)
     const setField = (field: keyof IRaceResultState, value: any) => {
         dispatch({type: 'SET_FIELD', payload: {field, value}});
     };
@@ -210,9 +209,13 @@ const DrowRaceResult = () => {
                 name: elem[6],
                 number: elem[0], finish: elem[10], pId: elem[1],
                 place: elem[2], gPlace: elem[3], chipTime: elem[11],
+                gunTime: elem[12],
                 dropDownName: `${elem[2]}. ${elem[6]} | ${elem[11]}`,
+                nameForTable: elem[6],
                 dropDownGenderName: `${elem[3]} . ${elem[6]} | ${elem[11]}`,
                 gender: elem[4] ? (elem[4] as string).toLowerCase().includes('f') ? "female" : "male" : "",
+                ageGroup: elem[4],
+                pace: elem[13]
             })
         })
         return participantsSelect
@@ -251,7 +254,8 @@ const DrowRaceResult = () => {
                         "fio0": state.participants.find(elem => elem.pId === state.selectPid[0]).name,
                         "chip0": currentElem.Chip ?? '00:00:00',
                         "chipSeconds0": currentElem.Chip ? transformTimeSeconds(currentElem.Chip) : 0,
-                        "sector0": currentElem.Sector ? transformTimeSeconds(currentElem.Sector) : 0,
+                        "sector0": currentElem.Sector ? currentElem.Sector : "",
+                        "sectorSeconds0": currentElem.Sector ? transformTimeSeconds(currentElem.Sector) : 0,
                     }
                 }))
             } else {
@@ -265,7 +269,8 @@ const DrowRaceResult = () => {
                     prev[elIndex][`speedString${index}`] = currElem.Speed ? currElem.Speed : "";
                     prev[elIndex][`fio${index}`] = state.participants.find(elem => elem.pId === state.selectPid[index]).name;
                     prev[elIndex][`chip${index}`] = currElem.Chip ? currElem.Chip : '00:00:00';
-                    prev[elIndex][`sector${index}`] = currElem.Sector ? transformTimeSeconds(currElem.Sector) : 0;
+                    prev[elIndex][`sectorSeconds${index}`] = currElem.Sector ? transformTimeSeconds(currElem.Sector) : 0;
+                    prev[elIndex][`sector${index}`] = currElem.Sector ?? '';
                     prev[elIndex][`chipSeconds${index}`] = currElem.Chip ? transformTimeSeconds(currElem.Chip) : 0;
                 })
             }
@@ -373,7 +378,7 @@ const DrowRaceResult = () => {
                                      onChange={handleChangeGender}/>
                       </Form.Item>}
 
-                      {state.participants.length > 0 && <Form.Item>
+                      {state.participants.length > 0 && <Form.Item className="w-full p-6 md:w-[500px] lg:w-[1200px] lg:p-0 ml-auto mr-auto">
                         <Select
                           mode="multiple"
                           allowClear
@@ -381,7 +386,6 @@ const DrowRaceResult = () => {
                           maxCount={10}
                           optionFilterProp="children"
                           filterOption={filterOption}
-                          className="w-full p-6 md:w-[500px] lg:w-[1200px] lg:p-0 ml-auto mr-auto"
                           placeholder="Выберите атлетов (не более 10)"
                           value={state.selectPid}
                           onChange={handleParticipantsChange}
@@ -414,6 +418,7 @@ const DrowRaceResult = () => {
 
                 {state.finalSplits.length > 0 && <div>
                     {!state.isLoading && <div>
+                      <RaceTable participants={state.selectPid.map(item => state.participants.find(el => el.pId === item) )}></RaceTable>
                       <DynamicComponent dynamics={state.transformDynamics} selectPid={state.selectPid}
                                         legend={state.legend}></DynamicComponent>
                       <TimeBarChart dynamics={state.transformDynamics} selectedPid={state.selectPid}

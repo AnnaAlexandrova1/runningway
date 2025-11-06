@@ -175,3 +175,10 @@ header {
 .recharts-text.recharts-cartesian-axis-tick-value {
     white-space: pre-line;
 }
+
+.about-us-container {
+    font-family: "Playpen Sans", cursive;
+    font-size: 25px;
+    font-weight: 300;
+    font-style: normal;
+}
