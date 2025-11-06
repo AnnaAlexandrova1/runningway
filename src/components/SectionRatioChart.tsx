@@ -1,7 +1,7 @@
 import React from "react";
 import {IObjecLiteral} from "../interfaces/interfaces";
 import {data} from "react-router-dom";
-import {Bar, BarChart, CartesianGrid, Legend, Rectangle, Tooltip, XAxis, YAxis} from "recharts";
+import {Bar, BarChart, CartesianGrid, Legend, Rectangle, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import {chartColors} from "../configData/stylesData";
 import DataTransformService from "../services/DataTransformService";
 
@@ -9,7 +9,7 @@ const SectionRatioChart = (props: { dynamics: IObjecLiteral[], selectedPid: stri
     const dataTransformService = new DataTransformService();
     const {dynamics, selectedPid, legend} = props;
 
-    const tickFormatter =  (value: number) => {
+    const tickFormatter = (value: number) => {
         return value + "%";
     }
 
@@ -34,39 +34,33 @@ const SectionRatioChart = (props: { dynamics: IObjecLiteral[], selectedPid: stri
         })
     }
 
-    let calcData = calcRathio()
-    const calcWidth = (): number => {
-        let width = window.innerWidth;
-        return dataTransformService.calcWidth(width)
-    }
-
     return (<div className='diagrams-container'>
         <h3 className="diagrams-name">Время участка к общему времени дистанции</h3>
         <span className="diagrams-info">(соотношение в % времени сегмента к времени преодоления всей дистанции)</span>
-        <BarChart
-            width={calcWidth()}
-            height={500}
-            data={calcRathio()}
-            margin={{
-                top: 20,
-                left: 60      // Увеличиваем для левой оси
-            }}
-            className="diagram"
-        >
-            <CartesianGrid strokeDasharray="3 3"/>
-            <XAxis dataKey="Name"/>
-            <YAxis tickFormatter={tickFormatter}/>
-            <Tooltip formatter={tickFormatter}/>
-            <Legend/>
+        <div className="w-[90%] md:w-[90%] lg:w-[92%] lg:w-min-[1200px] ml-auto mr-auto">
+            <ResponsiveContainer width="100%" height={500}>
+                <BarChart
+                    data={calcRathio()}
+                    margin={{
+                        top: 20,
+                        left: 20      // Увеличиваем для левой оси
+                    }}
+                    className="diagram"
+                >
+                    <CartesianGrid strokeDasharray="3 3"/>
+                    <XAxis dataKey="Name"/>
+                    <YAxis tickFormatter={tickFormatter}/>
+                    <Tooltip formatter={tickFormatter}/>
+                    <Legend/>
 
-            {selectedPid.map((item, i) => {
-                    return <Bar key={item} dataKey={`ratio${i}`}
-                                name={legend[`fio${i}`]}
-                                fill={chartColors[i]}
-                                activeBar={<Rectangle stroke="blue"/>}/>
-                }
-            )}
-        </BarChart>
+                    {selectedPid.map((item, i) => {
+                            return <Bar key={item} dataKey={`ratio${i}`}
+                                        name={legend[`fio${i}`]}
+                                        fill={chartColors[i]}
+                                        activeBar={<Rectangle stroke="blue"/>}/>
+                        }
+                    )}
+                </BarChart></ResponsiveContainer></div>
     </div>)
 }
 

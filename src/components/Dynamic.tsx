@@ -1,4 +1,4 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import {LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer} from 'recharts';
 
 
 // @ts-ignore
@@ -18,40 +18,38 @@ const DynamicComponent = (props: { dynamics: [], selectPid: string[], legend: IO
         return data.slice(1)
     }
 
-    const calcWidth = (): number => {
-        let width = window.innerWidth;
-        return dataTransformService.calcWidth(width)
-    }
 
     return (
         <div className='diagrams-container'>
             <h3 className="diagrams-name">Динамика позиций</h3>
             <span
                 className="diagrams-info">("-1" - не считался чип)</span>
-            <LineChart
-                width={calcWidth()}
-                height={600}
-                margin={{
-                    top: 20,
-                    left: 60
-                }}
-                data={dynamicsWithoutFirst(dynamics)}
-                className="diagram"
+            <div className="w-[90%] md:w-[90%] lg:w-[92%] lg:w-min-[1200px] ml-auto mr-auto">
+                <ResponsiveContainer width="100%" height={600}>
+                <LineChart
+                    margin={{
+                        top: 20,
+                        left: 20
+                    }}
+                    data={dynamicsWithoutFirst(dynamics)}
+                    className="diagram"
 
-            >
-                <CartesianGrid strokeDasharray="3 3"/>
-                <XAxis dataKey="Name" allowDataOverflow/>
-                <YAxis minTickGap={2}/>
-                <Tooltip/>
-                <Legend/>
-                {selectPid.map((item, i) => {
-                        return <Line key={item} type="monotone" dataKey={`position${i}`}
-                                     stroke={chartColors[i]}
-                                     name={legend[`fio${i}`]}
-                        />
-                    }
-                )}
-            </LineChart>
+                >
+                    <CartesianGrid strokeDasharray="3 3"/>
+                    <XAxis dataKey="Name" allowDataOverflow/>
+                    <YAxis minTickGap={2}/>
+                    <Tooltip/>
+                    <Legend/>
+                    {selectPid.map((item, i) => {
+                            return <Line key={item} type="monotone" dataKey={`position${i}`}
+                                         stroke={chartColors[i]}
+                                         name={legend[`fio${i}`]}
+                            />
+                        }
+                    )}
+                </LineChart>
+                </ResponsiveContainer>
+            </div>
         </div>
     );
 }
