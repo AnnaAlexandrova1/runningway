@@ -3,8 +3,10 @@ import {IObjecLiteral} from "../interfaces/interfaces";
 import {data} from "react-router-dom";
 import {Bar, BarChart, CartesianGrid, Legend, Rectangle, Tooltip, XAxis, YAxis} from "recharts";
 import {chartColors} from "../configData/stylesData";
+import DataTransformService from "../services/DataTransformService";
 
 const SectionRatioChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[], legend: IObjecLiteral }) => {
+    const dataTransformService = new DataTransformService();
     const {dynamics, selectedPid, legend} = props;
 
     const tickFormatter =  (value: number) => {
@@ -25,7 +27,7 @@ const SectionRatioChart = (props: { dynamics: IObjecLiteral[], selectedPid: stri
 
         return dynamicsWF.map((item, index) => {
             finishValues.forEach((elem, elemIndex) => {
-                item[`ratio${elemIndex}`] = Number(((item[`sector${elemIndex}`] / elem[`chipSeconds${elemIndex}`]) * 100).toFixed(2));
+                item[`ratio${elemIndex}`] = Number(((item[`sectorSeconds${elemIndex}`] / elem[`chipSeconds${elemIndex}`]) * 100).toFixed(2));
             })
 
             return item
@@ -33,12 +35,16 @@ const SectionRatioChart = (props: { dynamics: IObjecLiteral[], selectedPid: stri
     }
 
     let calcData = calcRathio()
+    const calcWidth = (): number => {
+        let width = window.innerWidth;
+        return dataTransformService.calcWidth(width)
+    }
 
     return (<div className='diagrams-container'>
         <h3 className="diagrams-name">Время участка к общему времени дистанции</h3>
         <span className="diagrams-info">(соотношение в % времени сегмента к времени преодоления всей дистанции)</span>
         <BarChart
-            width={Math.max(window.innerWidth * 0.88, 1200)}
+            width={calcWidth()}
             height={500}
             data={calcRathio()}
             margin={{

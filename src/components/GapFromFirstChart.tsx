@@ -4,13 +4,16 @@ import {CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis} from "rec
 import {chartColors} from "../configData/stylesData";
 import dynamic from "./Dynamic";
 import {maxAthlets} from "../configData/data";
+import DataTransformService from "../services/DataTransformService";
 
 const GapFromFirstChart = (props: { dynamics: IObjecLiteral[], selectedPid: string[], legend: IObjecLiteral }) => {
+    const dataTransformService = new DataTransformService();
     const {dynamics, selectedPid, legend} = props;
 
     const formatter = (value: number, name) => {
         return [tickFormatter(value), name];
     }
+
 
     const tickFormatter = (value: number) => {
         const hours = Math.floor(Math.abs(value) / 3600);
@@ -22,6 +25,10 @@ const GapFromFirstChart = (props: { dynamics: IObjecLiteral[], selectedPid: stri
         return newVal;
     }
 
+    const calcWidth = (): number => {
+        let width = window.innerWidth;
+        return dataTransformService.calcWidth(width)
+    }
 
     function getKeyByValue(object: {}, value: number) {
         return Object.keys(object).find(key => object[key] === value);
@@ -66,7 +73,7 @@ const GapFromFirstChart = (props: { dynamics: IObjecLiteral[], selectedPid: stri
         <span className="diagrams-info">(время по чип-тайму, отрицательное - обгон первого из выборки на отрезке)</span>
 
         <LineChart
-            width={Math.max(window.innerWidth * 0.88, 1200)}
+            width={calcWidth()}
             margin={{
                 top: 20,
                 left: 60      // Увеличиваем для левой оси

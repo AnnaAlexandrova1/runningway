@@ -6,13 +6,20 @@ import React from 'react';
 import {dynamics} from "../configData/data";
 import {IObjecLiteral} from "../interfaces/interfaces";
 import {chartColors} from "../configData/stylesData";
+import DataTransformService from "../services/DataTransformService";
 
 
 const DynamicComponent = (props: { dynamics: [], selectPid: string[], legend: IObjecLiteral }) => {
+    const dataTransformService = new DataTransformService();
     const {dynamics, selectPid, legend} = props;
 
     const dynamicsWithoutFirst = (data: any[]) => {
         return data.slice(1)
+    }
+
+    const calcWidth = (): number => {
+        let width = window.innerWidth;
+        return dataTransformService.calcWidth(width)
     }
 
     return (
@@ -21,7 +28,7 @@ const DynamicComponent = (props: { dynamics: [], selectPid: string[], legend: IO
             <span
                 className="diagrams-info">("-1" - не считался чип)</span>
             <LineChart
-                width={Math.max(window.innerWidth * 0.88, 1200)}
+                width={calcWidth()}
                 height={600}
                 margin={{
                     top: 20,
