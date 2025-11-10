@@ -1,4 +1,5 @@
 import {IObjecLiteral} from "../interfaces/interfaces";
+import { v7 as uuidv7 } from 'uuid';
 
 class LocalStorageService {
     constructor() {
@@ -11,6 +12,17 @@ class LocalStorageService {
 
     serRaceDetails(key: string, splits: IObjecLiteral[]): void{
         localStorage.setItem(key, JSON.stringify(splits));
+    }
+
+    getCounterKey(): string {
+        let keyName = 'guid'
+        let key = localStorage.getItem(keyName);
+        if(!key){
+            const newGuid = uuidv7();
+            localStorage.setItem(keyName, newGuid);
+            key = newGuid;
+        }
+        return key;
     }
 }
 

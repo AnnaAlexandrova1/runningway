@@ -13,12 +13,14 @@ import LocalStorageService from "../../services/LocalStorageService";
 import GapFromFirstChart from "../../components/GapFromFirstChart";
 import SectionRatioChart from "../../components/SectionRatioChart";
 import RaceTable from "../../components/RaceTable";
+import StatisticCountService from "../../services/StatisticCountService";
 
 const {Search} = Input;
 
 const DrowRaceResult = () => {
     const raceresultService = new RaceResultService();
     const localStorageService = new LocalStorageService();
+    const statisticCountService = new StatisticCountService();
     const [state, dispatch] = useReducer(raceResultReducer, initialRaseResultState);
     const [splits, setSplit] = useState<{}>([]);
 
@@ -141,6 +143,11 @@ const DrowRaceResult = () => {
     }
 
     const getSplits = async () => {
+        //для статистики сравнений
+         const key = localStorageService.getCounterKey();
+         await statisticCountService.setStatsCounter(key);
+
+        // основной запрос
         const requests = state.selectPid.map((elem, index) => {
             return {
                 key: `${index}`,
