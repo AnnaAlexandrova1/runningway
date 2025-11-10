@@ -1,6 +1,6 @@
 import LocalStorageService from "./LocalStorageService";
-const BASE_URL = 'https://192.168.1.249:443/api/v1/compare';
-// const BASE_URL = 'https://94.103.90.64:443/api/v1/compare';
+// const BASE_URL = 'https://192.168.1.249:443/api/v1/compare';
+const BASE_URL = 'https://www.runningway.ru/api/v1/compare';
 
 class StatisticCountService {
     async setStatsCounter(key: string) {
